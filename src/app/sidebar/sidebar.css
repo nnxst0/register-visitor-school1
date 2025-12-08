@@ -32,7 +32,7 @@
 .sidenav .logo-container .logo-text {
   margin-left: 1.5rem;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
 }
 .sidenav .logo-container .btn-close {
@@ -93,4 +93,18 @@
 .active .sidenav-link-icon,
 .active .sidenav-link-text {
   color: #000;
+}
+
+
+
+.logo:active {
+  transform: scale(0.92);   
+  opacity: 0.75;              
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+
+.logo:focus-visible {
+  outline: 2px solid rgba(0, 123, 255, 0.7);  
+  outline-offset: 3px;
+  border-radius: 8px;
 }

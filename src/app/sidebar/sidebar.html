@@ -5,13 +5,10 @@
 
   <div class="logo-container">
     <button class="logo" (click)="toggleCollapse()">
-      <i class="fal fa-bars"></i>
+      <i class="bi bi-list"></i>
     </button>
     @if (!isSidebarCollapsed()) {
       <div class="logo-text">เมนู</div>
-      <button class="btn-close" (click)="closeSidenav()">
-        <i class="fal fa-times close-icon"></i>
-      </button>
     }
   </div>
   <div class="sidenav-nav">

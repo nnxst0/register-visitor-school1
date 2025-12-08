@@ -1,7 +1,12 @@
 <app-sidebar 
-[isSidebarCollapsed]="isSidebarCollapsed"
+  [isSidebarCollapsed]="isSidebarCollapsed"
   (changeIsSidebarCollapsed)="onSidebarChange($event)">
 </app-sidebar>
-<main>
-  <app-register></app-register>
-</main>
+
+<app-main
+  [isLeftSidebarCollapsed]="SidebarCollapsed()"
+  [screenWidth]="screenWidth()">
+  
+  <router-outlet></router-outlet>
+
+</app-main>

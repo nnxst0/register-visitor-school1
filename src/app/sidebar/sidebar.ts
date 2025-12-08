@@ -14,23 +14,23 @@ export class Sidebar {
   changeIsSidebarCollapsed = output<boolean>();
   items = [
     {
-      routeLink: 'dashboard',
-      icon: 'fal fa-home',
+      routeLink: 'register',
+      icon: 'bi bi-people-fill',
       label: 'ลงทะเบียน',
     },
     {
-      routeLink: 'products',
-      icon: 'fal fa-box-open',
+      routeLink: 'datatable',
+      icon: 'bi bi-table',
       label: 'ข้อมูลผู้ติดต่อ',
     },
     {
-      routeLink: 'pages',
-      icon: 'fal fa-file',
+      routeLink: 'card',
+      icon: 'bi bi-person-vcard-fill',
       label: 'คืนบัตร',
     },
     {
-      routeLink: 'settings',
-      icon: 'fal fa-cog', 
+      routeLink: 'export',
+      icon: 'bi bi-cloud-download-fill', 
       label: 'ส่งออกข้อมูล',
     },
   ];

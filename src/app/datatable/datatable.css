@@ -1,0 +1,187 @@
+/* Container หลัก */
+.container {
+  font-family: "Mitr", sans-serif; /* แนะนำให้ import font Sarabun หรือ Kanit มาใส่ */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.bg-gradient {
+  background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
+}
+
+/* Header Title (แถบสีน้ำเงินเข้มด้านบน) */
+.header-title {
+  background-color: #3556c4; /* สีน้ำเงินตามรูป */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.icon-wrapper svg {
+  stroke: white;
+}
+
+/* Content Box (กล่องสีฟ้าอ่อน) */
+.content-box {
+  background-color: #ffffff89; /* สีพื้นหลังฟ้าอ่อน */
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Filters Section */
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  position: relative;
+  background-color: rgb(143, 233, 255);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
+  color: #3556c4;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filter-group label {
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.select-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.select-wrapper input {
+  border: none;
+  width: 20px; /* Hidden width mock */
+  outline: none;
+}
+
+.arrow {
+  color: #3556c4;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+/* Table Styles */
+.table-responsive {
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table Header (สีส้ม/เหลือง) */
+thead tr {
+  background-color: #fbb019; /* สีส้มเหลือง */
+  color: white;
+}
+
+th {
+  padding: 12px 8px;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+}
+
+th:last-child {
+  border-right: none;
+}
+
+/* Table Body */
+tbody tr {
+  border-bottom: 1px solid #3556c4;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+td {
+  padding: 15px 10px;
+  vertical-align: middle;
+  border-right: 1px solid #3556c4;
+  font-size: 14px;
+}
+
+td:last-child {
+  border-right: none;
+}
+
+/* Text Utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-blue { color: #3556c4; font-weight: 500; }
+.font-bold { font-weight: bold; }
+.pl-4 { padding-left: 1rem; }
+
+/* Link Button (คำว่า "รูป") */
+.link-btn {
+  background: none;
+  border: none;
+  color: #3556c4;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Footer Button (ปุ่มเพิ่มผู้มาติดต่อ) */
+.footer-action {
+  margin-top: auto; /* ดันลงล่างสุด */
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.btn-add {
+    font-family: "Mitr", sans-serif;
+  background-color: #fbb019;
+  color: white;
+  border: none;
+  padding: 10px 40px;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
+}
+
+.btn-add:hover {
+  background-color: #e69b00;
+}
+
+/* บังคับให้ input เปลี่ยนเมาส์เป็นรูปมือ */
+input[matStartDate], input[matEndDate] {
+  cursor: pointer;
+}
+
