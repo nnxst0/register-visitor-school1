@@ -1,0 +1,328 @@
+<div class="min-h-screen p-4 bg-gradient">
+  <div class="max-w-4xl mx-auto space-y-4">
+    
+    <!-- Header -->
+    <div class="rounded-lg p-4 flex items-center gap-3" style="background-color: #2E50BC;">
+      <div class="bg-white rounded-full p-2">
+        <div class="w-6 h-6 flex items-center justify-center" style="color: #2E50BC;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M4 20c0-4 3-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="18" cy="6" r="2" fill="currentColor"/>
+            <path d="M18 8v3m0 0h-3m3 0h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-xl font-bold text-white">ลงทะเบียนสำหรับผู้มาติดต่อ</h1>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="registrationForm" (ngSubmit)="handleSubmit()" class="bg-white rounded-lg shadow-lg p-6">
+      <div class="rounded-full px-6 py-2 inline-block mb-6 text-white font-medium" style="background-color: #2E50BC;">
+        ข้อมูลผู้มาติดต่อ
+      </div>
+
+      <!-- Upload Section -->
+      <div class="px-4 py-2 rounded-t-lg font-semibold text-sm" style="background-color: #FBB903;">
+        ข้อมูลบัตรประชาชน
+      </div>
+      <div class="border-2 border-dashed rounded-b-lg p-6 mb-6" style="border-color: #A2DCE7; background-color: #F0F9FB;">
+        <div class="flex flex-col items-center gap-2" style="color: #2E50BC;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          <p class="font-medium">คลิกเพื่อนำรูปถ่ายบัตรประชาชาน</p>
+          <p class="text-sm text-gray-500">รองรับสกุล JPG, PNG เท่านั้น</p>
+        </div>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            เลขบัตรประชาชน <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            formControlName="idCard"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('idCard')?.invalid && registrationForm.get('idCard')?.touched, 'border-gray-300': !registrationForm.get('idCard')?.invalid || !registrationForm.get('idCard')?.touched}"
+            maxlength="13"
+            placeholder="13 หลัก"
+          />
+          <ng-container *ngIf="registrationForm.get('idCard')?.invalid && registrationForm.get('idCard')?.touched">
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('idCard')?.errors?.['required']">กรุณากรอกเลขบัตรประชาชน</p>
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('idCard')?.errors?.['pattern']">เลขบัตรประชาชนต้องมี 13 หลักเป็นตัวเลขเท่านั้น</p>
+          </ng-container>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">ชื่อ <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="firstName"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('firstName')?.invalid && registrationForm.get('firstName')?.touched, 'border-gray-300': !registrationForm.get('firstName')?.invalid || !registrationForm.get('firstName')?.touched}"
+          />
+          <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('firstName')?.errors?.['required'] && registrationForm.get('firstName')?.touched">กรุณากรอกชื่อ</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">สกุล <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="lastName"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('lastName')?.invalid && registrationForm.get('lastName')?.touched, 'border-gray-300': !registrationForm.get('lastName')?.invalid || !registrationForm.get('lastName')?.touched}"
+          />
+          <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('lastName')?.errors?.['required'] && registrationForm.get('lastName')?.touched">กรุณากรอกสกุล</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">วันเกิด <span class="text-red-500">*</span></label>
+          <input
+            type="date"
+            formControlName="birthDate"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('birthDate')?.invalid && registrationForm.get('birthDate')?.touched, 'border-gray-300': !registrationForm.get('birthDate')?.invalid || !registrationForm.get('birthDate')?.touched}"
+          />
+          <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('birthDate')?.errors?.['required'] && registrationForm.get('birthDate')?.touched">กรุณากรอกวันเกิด</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="phone"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched, 'border-gray-300': !registrationForm.get('phone')?.invalid || !registrationForm.get('phone')?.touched}"
+            maxlength="10"
+            placeholder="0XX-XXXXXXX"
+          />
+          <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('phone')?.errors?.['required'] && registrationForm.get('phone')?.touched">กรุณากรอกเบอร์โทรศัพท์</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">ทะเบียนรถ (ถ้ามี)</label>
+          <input
+            type="text"
+            formControlName="licensePlate"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            placeholder="กข 1234"
+          />
+        </div>
+      </div>
+
+      <!-- Address Section -->
+      <div class="px-4 py-2 rounded-t-lg font-semibold text-sm" style="background-color: #FBB903;">ที่อยู่</div>
+      <div class="border border-gray-300 rounded-b-lg p-4 mb-4">
+        <div class="grid grid-cols-4 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">บ้านเลขที่ <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              formControlName="houseNumber"
+              class="w-full border rounded px-3 py-2 text-sm"
+              [ngClass]="{'border-red-500': registrationForm.get('houseNumber')?.invalid && registrationForm.get('houseNumber')?.touched, 'border-gray-300': !registrationForm.get('houseNumber')?.invalid || !registrationForm.get('houseNumber')?.touched}"
+            />
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('houseNumber')?.errors?.['required'] && registrationForm.get('houseNumber')?.touched">กรุณากรอกบ้านเลขที่</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">หมู่</label>
+            <input type="text" formControlName="moo" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">ซอย / ตรอก</label>
+            <input type="text" formControlName="soi" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">ถนน</label>
+            <input type="text" formControlName="road" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">ตำบล <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              formControlName="subDistrict"
+              class="w-full border rounded px-3 py-2 text-sm"
+              [ngClass]="{'border-red-500': registrationForm.get('subDistrict')?.invalid && registrationForm.get('subDistrict')?.touched, 'border-gray-300': !registrationForm.get('subDistrict')?.invalid || !registrationForm.get('subDistrict')?.touched}"
+            />
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('subDistrict')?.errors?.['required'] && registrationForm.get('subDistrict')?.touched">กรุณากรอกตำบล</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">อำเภอ <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              formControlName="district"
+              class="w-full border rounded px-3 py-2 text-sm"
+              [ngClass]="{'border-red-500': registrationForm.get('district')?.invalid && registrationForm.get('district')?.touched, 'border-gray-300': !registrationForm.get('district')?.invalid || !registrationForm.get('district')?.touched}"
+            />
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('district')?.errors?.['required'] && registrationForm.get('district')?.touched">กรุณากรอกอำเภอ</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">จังหวัด <span class="text-red-500">*</span></label>
+            <select
+              formControlName="province"
+              class="w-full border rounded px-3 py-2 text-sm"
+              [ngClass]="{'border-red-500': registrationForm.get('province')?.invalid && registrationForm.get('province')?.touched, 'border-gray-300': !registrationForm.get('province')?.invalid || !registrationForm.get('province')?.touched}"
+            >
+              <option value="">เลือก</option>
+              <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+              <option value="เชียงใหม่">เชียงใหม่</option>
+              <option value="ภูเก็ต">ภูเก็ต</option>
+              <option value="สงขลา">สงขลา</option>
+            </select>
+            <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('province')?.errors?.['required'] && registrationForm.get('province')?.touched">กรุณาเลือกจังหวัด</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RFID Section -->
+      <div class="px-4 py-2 rounded-t-lg font-semibold text-sm" style="background-color: #FBB903;">RFID CARD</div>
+      <div class="border border-gray-300 rounded-b-lg p-4 mb-6">
+        <div class="w-1/3">
+          <label class="block text-sm font-medium mb-1">บัตร RFID <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="rfid"
+            class="w-full border rounded px-3 py-2 text-sm"
+            [ngClass]="{'border-red-500': registrationForm.get('rfid')?.invalid && registrationForm.get('rfid')?.touched, 'border-gray-300': !registrationForm.get('rfid')?.invalid || !registrationForm.get('rfid')?.touched}"
+          />
+          <p class="text-red-500 text-xs mt-1" *ngIf="registrationForm.get('rfid')?.errors?.['required'] && registrationForm.get('rfid')?.touched">กรุณากรอกบัตร RFID</p>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button
+          type="submit"
+          class="font-bold px-8 py-3 rounded-lg transition-colors text-black hover-opacity-90"
+          style="background-color: #FBB903;"
+        >
+          บันทึกข้อมูล
+        </button>
+      </div>
+    </form>
+
+    <!-- Department Selection Section -->
+    <div *ngIf="showDepartmentSelection" class="bg-white rounded-lg shadow-lg p-6">
+      <div class="rounded-full px-6 py-2 inline-block mb-4 text-white font-medium" style="background-color: #2E50BC;">
+        ระบบงานรักษาความปลอดภัย
+      </div>
+
+      <p class="font-medium mb-4" style="color: #2E50BC;">
+        {{ getCurrentVisitorMessage() }}
+      </p>
+      <p class="text-gray-700 mb-4">ส่วนงานที่จะเข้าไปติดต่อ</p>
+
+      <div class="space-y-2 mb-6">
+        <label *ngFor="let dept of departments" class="flex items-center gap-3 p-2 hover-bg-gray-50 rounded cursor-pointer">
+          <input
+            type="radio"
+            name="department"
+            [value]="dept"
+            [checked]="selectedDepartment === dept"
+            (change)="handleDepartmentSelect(dept)"
+            class="w-4 h-4"
+            style="accent-color: #2E50BC;"
+          />
+          <span class="text-gray-700">{{ dept }}</span>
+        </label>
+      </div>
+
+      <form [formGroup]="officerForm" (ngSubmit)="handleSaveDepartment()">
+        <div *ngIf="showOfficerInput" class="ml-8 mb-6 p-4 border rounded-lg" style="background-color: #F0F9FB; border-color: #A2DCE7;">
+          <div class="flex items-center gap-3 mb-3" style="color: #2E50BC;">
+            <span class="w-2 h-2 rounded-full" style="background-color: #2E50BC;"></span>
+            <span class="font-medium">ต้องการติดต่อ</span>
+          </div>
+          <div class="ml-5">
+            <label class="block text-sm font-medium mb-1">
+              กรอกชื่อ-สกุล ข้าราชการครูที่ต้องการติดต่อ <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="officerName"
+              placeholder="ชื่อ-สกุล ข้าราชการครู"
+              class="w-full border rounded px-3 py-2 text-sm"
+              [ngClass]="{'border-red-500': officerForm.get('officerName')?.invalid && officerForm.get('officerName')?.touched, 'border-gray-300': !officerForm.get('officerName')?.invalid || !officerForm.get('officerName')?.touched}"
+            />
+            <p class="text-red-500 text-xs mt-1" *ngIf="officerForm.get('officerName')?.errors?.['required'] && officerForm.get('officerName')?.touched">กรุณากรอกชื่อข้าราชการที่ต้องการติดต่อ</p>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button
+            type="submit"
+            class="font-bold px-8 py-3 rounded-lg transition-colors text-black hover-opacity-90"
+            style="background-color: #FBB903;"
+          >
+            บันทึกข้อมูล
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Visitor List Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2 font-medium" style="color: #2E50BC;">
+          <div class="w-8 h-8 border-2 rounded flex items-center justify-center font-bold text-lg" style="border-color: #2E50BC;">
+            ≡
+          </div>
+          <span>รายการผู้มาติดต่อ</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex items-center gap-2 border border-gray-300 rounded px-3 py-1-5 text-sm hover-bg-gray-50">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            ค้นหา
+          </button>
+          <button class="flex items-center gap-2 border border-gray-300 rounded px-3 py-1-5 text-sm hover-bg-gray-50">ส่งออก</button>
+          <button class="flex items-center gap-2 border border-gray-300 rounded px-3 py-1-5 text-sm hover-bg-gray-50">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+          </button>
+          <button class="text-white rounded px-3 py-1-5 text-sm hover-opacity-90" style="background-color: #FF4081;">เลือก</button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead style="background-color: #FBB903;">
+            <tr>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">#</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">เลขบัตรประชาชน</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">ชื่อ-สกุล</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">วันเกิด</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">เบอร์</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">ที่อยู่</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">RFID</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300">วันที่</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let visitor of visitors; let index = index" [ngStyle]="{'background-color': index % 2 === 0 ? '#E8F4F8' : 'white'}">
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.id }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.idCard }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.name }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.birthDate }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.phone }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.address }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.rfid }}</td>
+              <td class="px-3 py-2 border-b border-gray-200">{{ visitor.registeredAt }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
