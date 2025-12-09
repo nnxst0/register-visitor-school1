@@ -185,3 +185,51 @@ input[matStartDate], input[matEndDate] {
   cursor: pointer;
 }
 
+/* คอนเทนเนอร์หลัก พื้นหลังสีฟ้าอ่อน (ปรับสีตามธีมจริงของคุณได้) */
+.custom-date-container {
+    display: flex;
+    gap: 15px; /* ระยะห่างระหว่าง 2 ปุ่ม */
+    padding: 20px; /* สีฟ้าตามภาพ */
+    border-radius: 8px; /* หรือเอาออกถ้าพื้นหลังเป็นของทั้งหน้า */
+    align-items: center;
+}
+
+/* ตัวปุ่มสีขาวทรงแคปซูล */
+.date-pill {
+    background-color: white;
+    padding: 8px 16px;
+    border-radius: 50px; /* ทำให้ขอบมนเป็นวงรี */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 140px; /* ความกว้างขั้นต่ำ */
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* เงาบางๆ ให้ดูมีมิติ */
+    transition: all 0.2s;
+}
+
+.date-pill:hover {
+    background-color: #f5f5f5;
+}
+
+/* ตัวหนังสือวันที่ */
+.date-text {
+    color: #3F51B5; /* สีน้ำเงินเข้มตามภาพ */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* ไอคอนลูกศรลง */
+.dropdown-icon {
+    color: #3F51B5; /* สีเดียวกับตัวหนังสือ */
+    margin-left: 8px;
+}
+
+/* ซ่อนตัว Input เดิมของ Material */
+.hidden-picker {
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    position: absolute;
+    overflow: hidden;
+}

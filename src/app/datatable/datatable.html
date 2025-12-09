@@ -12,33 +12,31 @@
 
   <div class="content-box">
     
-                <div class="filters">
-        
-            <mat-form-field appearance="fill">
-            <mat-label>เลือกช่วงวันที่</mat-label>
-            
-            <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate 
-                    placeholder="วันที่เริ่มต้น" 
-                    readonly 
-                    (click)="picker.open()"
-                    [(ngModel)]="startDate">
-                    
-            <input matEndDate 
-                    placeholder="วันที่สิ้นสุด" 
-                    readonly 
-                    (click)="picker.open()"
-                    [(ngModel)]="endDate">
-            </mat-date-range-input>
-            
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-        
-        </mat-form-field>
+      <div class="custom-date-container">
+          
+          <div class="date-pill" (click)="picker.open()">
+              <span class="date-text">
+                  {{ startDate ? (startDate | date:'dd/MM/yyyy') : 'วันที่เริ่มต้น' }}
+              </span>
+              <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+          </div>
 
-        </div>
+          <div class="date-pill" (click)="picker.open()">
+              <span class="date-text">
+                  {{ endDate ? (endDate | date:'dd/MM/yyyy') : 'วันที่สิ้นสุด' }}
+              </span>
+              <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+          </div>
 
-        <p>เริ่ม: {{ startDate | date:'dd/MM/yyyy' }} - จบ: {{ endDate | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <mat-form-field class="hidden-picker">
+          <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate [(ngModel)]="startDate">
+              <input matEndDate [(ngModel)]="endDate">
+          </mat-date-range-input>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
 
     <div class="table-responsive">
       <table>
@@ -74,7 +72,7 @@
     </div>
 
     <div class="footer-action">
-      <button class="btn-add" (click)="addVisitor()">เพิ่มผู้มาติดต่อ</button>
+      <button class="btn-add" routerLink="/register">เพิ่มผู้มาติดต่อ</button>
     </div>
 
   </div>
