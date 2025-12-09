@@ -5,7 +5,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input'; 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-
+import { MatIconModule } from '@angular/material/icon';
+import { RouterLink } from '@angular/router'
+import { Router } from '@angular/router';
 
 // สร้าง Interface สำหรับข้อมูล (Type Safety)
 interface Visitor {
@@ -22,7 +24,14 @@ interface Visitor {
 @Component({
   selector: 'app-datatable',
   standalone: true,
-  imports: [CommonModule, FormsModule , MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule], // Import module ที่จำเป็น
+  imports: [CommonModule, 
+            FormsModule ,
+            MatFormFieldModule,
+            MatInputModule, 
+            MatDatepickerModule,
+            MatNativeDateModule ,
+            MatIconModule,
+            RouterLink], // Import module ที่จำเป็น
   templateUrl: './datatable.html',
   styleUrls: ['./datatable.css']
 })
@@ -77,11 +86,17 @@ export class DatatableComponent {
 
   // ตัวแปรสำหรับ Date Filter (Mock
 
-  addVisitor() {
-    alert('ฟังก์ชันเพิ่มผู้มาติดต่อ');
-  }
 
   viewImage(id: number) {
     alert(`ดูรูปภาพของ ID: ${id}`);
   }
+
+  // 2. ฉีด (Inject) Router เข้ามาใช้งาน
+  constructor(private router: Router) {}
+
+  // 3. ฟังก์ชันสำหรับปุ่มกด
+  addVisitor() {
+    this.router.navigate(['/register']);
+  }
+
 }

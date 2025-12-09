@@ -3,15 +3,13 @@ import { RouterOutlet } from '@angular/router';
 import { Sidebar } from './sidebar/sidebar';
 import { Main } from './main/main';
 import { CommonModule } from '@angular/common';
-import { RegisterComponent } from "./register/register";
 import { HostListener } from '@angular/core';
-import { DatatableComponent } from "./datatable/datatable";
 
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, Main, CommonModule, RegisterComponent, DatatableComponent],
+  imports: [RouterOutlet, Sidebar, Main, CommonModule,  ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
