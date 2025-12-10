@@ -1,4 +1,5 @@
-<div class="export-container">
+<div class="export-wrapper">
+  <div class="export-container">
     <!-- Header -->
     <div class="header">
         <i class="fas fa-file-export"></i>
@@ -122,12 +123,15 @@
                         <td>{{ record.department }}</td>
                         <td>{{ record.dateRange }}</td>
                         <td>{{ record.format }}</td>
-                        <td [class]="record.status === 'เสร็จสิ้น' ? 'status-success' : 'status-error'">
-                            {{ record.status }}
+                        <td>
+                            <span [class]="record.status === 'เสร็จสิ้น' ? 'status-success' : 'status-error'">
+                                {{ record.status }}
+                            </span>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
+  </div>
 </div>

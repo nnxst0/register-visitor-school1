@@ -39,8 +39,32 @@
 }
 
 /* Header */
+/* Header */
+.header {
+  background: linear-gradient(135deg, #2E50BC 0%, #3d63d4 100%);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(46, 80, 188, 0.2);
+  justify-content: center;
+}
+
+.header i {
+  font-size: 48px;
+}
+
+.header h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 0;
+}
+
 .rounded-lg {
-  border-radius: 0.5rem;
+  border-radius: 10px;
 }
 
 .flex {
