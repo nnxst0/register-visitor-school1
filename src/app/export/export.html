@@ -1,0 +1,133 @@
+<div class="export-container">
+    <!-- Header -->
+    <div class="header">
+        <i class="fas fa-file-export"></i>
+        <h1>ส่งออกข้อมูลรายงาน</h1>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+        <h2>ส่งออกข้อมูลผู้มาติดต่อ</h2>
+
+        <div class="form-row">
+            <!-- เลือกส่วนงาน -->
+            <div class="form-group">
+                <label>เลือกส่วนงาน</label>
+                <div class="select-wrapper">
+                    <select [(ngModel)]="selectedDepartment" class="form-control">
+                        <option value="ทั้งหมด">ทั้งหมด</option>
+                        <option value="สำนักงานผู้อำนวยการ">สำนักงานผู้อำนวยการ</option>
+                        <option value="กลุ่มบริหารงานบุคคล">กลุ่มบริหารงานบุคคล</option>
+                        <option value="กลุ่มบริหารวิชาการ">กลุ่มบริหารวิชาการ</option>
+                        <option value="กลุ่มบริหารทั่วไป">กลุ่มบริหารทั่วไป</option>
+                        <option value="กลุ่มบริหารงบประมาน">กลุ่มบริหารงบประมาน</option>
+                        <option value="ติดต่อ ข้าราชการครู">ติดต่อ ข้าราชการครู</option>
+                        <option value="นักพัฒนา">นักพัฒนา</option>
+                        <option value="พ่อค้า และ แม่ค้า">พ่อค้า และ แม่ค้า</option>
+                        <option value="ร้านค้าสหกรณ์โรงเรียน">ร้านค้าสหกรณ์โรงเรียน</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+
+            <!-- วันที่เริ่มต้น -->
+            <div class="form-group">
+                <label>วันที่เริ่มต้น</label>
+                <div class="date-input-wrapper">
+                    <input type="date" [(ngModel)]="startDate" class="form-control" placeholder="เลือกวันที่">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+
+            <!-- วันที่สิ้นสุด -->
+            <div class="form-group">
+                <label>วันที่สิ้นสุด</label>
+                <div class="date-input-wrapper">
+                    <input type="date" [(ngModel)]="endDate" class="form-control" placeholder="เลือกวันที่">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <div class="format-buttons">
+                <label>รูปแบบไฟล์</label>
+                <button [class.active]="selectedFormat === 'CSV'" (click)="selectFormat('CSV')" class="format-btn">
+                    CSV
+                </button>
+                <button [class.active]="selectedFormat === 'Excel'" (click)="selectFormat('Excel')" class="format-btn">
+                    Excel
+                </button>
+                <button [class.active]="selectedFormat === 'JSON'" (click)="selectFormat('JSON')" class="format-btn">
+                    JSON
+                </button>
+            </div>
+
+            <button class="export-btn" (click)="exportData()">
+                ส่งออกข้อมูล
+            </button>
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="history-section">
+        <div class="history-header">
+            <div class="title-with-icon">
+                <i class="fas fa-history"></i>
+                <h2>ประวัติส่งออก</h2>
+            </div>
+
+            <div class="history-filters">
+                <div class="date-range-filter">
+                    <div class="date-filter">
+                        <input type="date" [(ngModel)]="filterStartDate" (change)="filterHistory()" class="filter-input" placeholder="วันที่เริ่มต้น">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <span class="date-separator">-</span>
+                    <div class="date-filter">
+                        <input type="date" [(ngModel)]="filterEndDate" (change)="filterHistory()" class="filter-input" placeholder="วันที่สิ้นสุด">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <button class="clear-btn" (click)="clearFilters()" *ngIf="filterStartDate || filterEndDate">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="sort-filter">
+                    <i class="fas fa-bars sort-icon"></i>
+                    <select [(ngModel)]="sortOrder" class="filter-select" (change)="sortHistory()">
+                        <option value="desc">ล่าสุด</option>
+                        <option value="asc">เก่าสุด</option>
+                    </select>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>วันที่ส่งออก</th>
+                        <th>ประเภทส่วนงาน</th>
+                        <th>ช่วงวันที่</th>
+                        <th>รูปแบบไฟล์</th>
+                        <th>สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let record of exportHistory">
+                        <td>{{ record.exportDate }}</td>
+                        <td>{{ record.department }}</td>
+                        <td>{{ record.dateRange }}</td>
+                        <td>{{ record.format }}</td>
+                        <td [class]="record.status === 'เสร็จสิ้น' ? 'status-success' : 'status-error'">
+                            {{ record.status }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
