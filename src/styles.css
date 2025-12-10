@@ -4,9 +4,22 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   position: relative;
   font-family: "Mitr", sans-serif;
-  background: #f4f7fa;
+  background: white;
+  min-height: 100vh;
+  background-attachment: fixed;
+  background-size: cover;
 }
 
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  font-family: "Mitr", sans-serif;
+  opacity: 0.6;
+}
