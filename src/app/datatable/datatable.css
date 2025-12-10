@@ -1,9 +1,11 @@
 /* Container หลัก */
 .container {
-  font-family: "Mitr", sans-serif; /* แนะนำให้ import font Sarabun หรือ Kanit มาใส่ */
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
+  padding: 2rem;
+  font-family: 'mitr', sans-serif;  
+  flex-direction: column;
+  align-items: center;
 }
 
 
@@ -37,7 +39,7 @@
 
 /* Content Box (กล่องสีฟ้าอ่อน) */
 .content-box {
-  background-color: #A2DCE7; /* สีพื้นหลังฟ้าอ่อน */
+  background-color: #ffffff; /* สีพื้นหลังฟ้าอ่อน */
   padding: 20px;
   border-radius: 10px;
   min-height: 500px;
@@ -89,7 +91,7 @@
 
 /* Table Styles */
 .table-responsive {
-  background-color: #ffffff;
+  background-color: #d9f3fa;
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 20px;
@@ -198,7 +200,7 @@ input[matStartDate], input[matEndDate] {
 
 /* ตัวปุ่มสีขาวทรงแคปซูล */
 .date-pill {
-    background-color: white;
+    background-color: #3556c4;
     padding: 8px 16px;
     border-radius: 50px; /* ทำให้ขอบมนเป็นวงรี */
     display: flex;
@@ -211,19 +213,19 @@ input[matStartDate], input[matEndDate] {
 }
 
 .date-pill:hover {
-    background-color: #f5f5f5;
+    background-color: #304ba1;
 }
 
 /* ตัวหนังสือวันที่ */
 .date-text {
-    color: #3F51B5; /* สีน้ำเงินเข้มตามภาพ */
+    color: #ffffff; /* สีน้ำเงินเข้มตามภาพ */
     font-weight: bold;
     font-size: 16px;
 }
 
 /* ไอคอนลูกศรลง */
 .dropdown-icon {
-    color: #3F51B5; /* สีเดียวกับตัวหนังสือ */
+    color: #ffffff; /* สีเดียวกับตัวหนังสือ */
     margin-left: 8px;
 }
 

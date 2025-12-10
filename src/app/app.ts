@@ -1,41 +1,31 @@
-import { Component, signal } from '@angular/core';
-import { Sidebar } from './sidebar/sidebar';
-import { Maincomponent } from './main/main';
-import { CommonModule } from '@angular/common';
-import { HostListener } from '@angular/core';
-
-
+import { Component, HostListener, OnInit, signal } from '@angular/core';
+import { LeftSidebarComponent } from './left-sidebar/left-sidebar';
+import { MainComponent } from './main/main';
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, Maincomponent, CommonModule,  ],
+  standalone: true,
+  imports: [LeftSidebarComponent, MainComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
-export class App {
-  protected readonly title = signal('register-visitor-school');
-  isSidebarCollapsed = false;
-
-  onSidebarChange(collapsed: boolean) {
-    this.isSidebarCollapsed = collapsed;
-  }
-  SidebarCollapsed = signal<boolean>(false);
+export class AppComponent implements OnInit {
+  isLeftSidebarCollapsed = signal<boolean>(false);
   screenWidth = signal<number>(window.innerWidth);
 
   @HostListener('window:resize')
   onResize() {
     this.screenWidth.set(window.innerWidth);
     if (this.screenWidth() < 768) {
-      this.SidebarCollapsed.set(true);
+      this.isLeftSidebarCollapsed.set(true);
     }
   }
 
   ngOnInit(): void {
-    this.SidebarCollapsed.set(this.screenWidth() < 768);
+    this.isLeftSidebarCollapsed.set(this.screenWidth() < 768);
   }
 
-  changeSidebarCollapsed(SidebarCollapsed: boolean): void {
-    this.SidebarCollapsed.set(SidebarCollapsed);
+  changeIsLeftSidebarCollapsed(isLeftSidebarCollapsed: boolean): void {
+    this.isLeftSidebarCollapsed.set(isLeftSidebarCollapsed);
   }
-  
 }

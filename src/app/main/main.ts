@@ -9,12 +9,12 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './main.html',
   styleUrl: './main.css',
 })
-export class Maincomponent {
-  SidebarCollapsed = input.required<boolean>();
+export class MainComponent {
+  isLeftSidebarCollapsed = input.required<boolean>();
   screenWidth = input.required<number>();
   sizeClass = computed(() => {
-    const SidebarCollapsed = this.SidebarCollapsed();
-    if (SidebarCollapsed) {
+    const isLeftSidebarCollapsed = this.isLeftSidebarCollapsed();
+    if (isLeftSidebarCollapsed) {
       return '';
     }
     return this.screenWidth() > 768 ? 'body-trimmed' : 'body-md-screen';
