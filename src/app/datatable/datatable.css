@@ -9,32 +9,27 @@
 }
 
 
-/* Header Title (แถบสีน้ำเงินเข้มด้านบน) */
-.header-title {
-  background-color: #3556c4; /* สีน้ำเงินตามรูป */
+.header {
+  background: linear-gradient(135deg, #2E50BC 0%, #3d63d4 100%);
   color: white;
-  padding: 15px 20px;
-  border-radius: 10px;
+  padding: 12px 25px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
+  gap: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(46, 80, 188, 0.2);
+  justify-content: center;
 }
 
-.header-title h1 {
-   margin: 0;
-    font-size: 1.8rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+.header i {
+  font-size: 48px;
 }
 
-.icon-wrapper svg {
-  stroke: white;
+.header h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 0;
 }
 
 /* Content Box (กล่องสีฟ้าอ่อน) */

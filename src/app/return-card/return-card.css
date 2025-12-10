@@ -16,27 +16,27 @@
 }
 
 /* Header */
-.top-header {
-  background-color: #3556c4; /* สีน้ำเงินตามรูป */
+.header {
+  background: linear-gradient(135deg, #2E50BC 0%, #3d63d4 100%);
   color: white;
-  padding: 15px 20px;
-  border-radius: 10px;
+  padding: 12px 25px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
+  gap: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  
-  h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
+  box-shadow: 0 4px 6px rgba(46, 80, 188, 0.2);
+  justify-content: center;
+}
+
+.header i {
+  font-size: 48px;
+}
+
+.header h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 0;
 }
 
 /* Card Section (Top) */
@@ -290,4 +290,50 @@
   }
   border-bottom: 1px solid #a8d5e2;
   border-radius: 0 0 8px 8px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* กล่องฟิลเตอร์แต่ละอัน */
+.filter-search,
+.filter-date,
+.filter-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border-radius: 16px;
+  padding: 10px 18px;
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  min-width: 150px; /* เพิ่มความกว้างขั้นต่ำ */
+}
+
+/* input ค้นหา */
+.filter-search input {
+  border: none;
+  outline: none;
+  width: 120px;
+  font-size: 16px;
+}
+
+/* input วันที่ */
+.filter-date input[type="date"] {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  width: 140px; /* เพิ่มความกว้าง */
+}
+
+/* ไอคอน */
+.filter-search i,
+.filter-date i,
+.filter-sort i {
+  color: #2355d8;
+  font-size: 18px;
+  flex-shrink: 0;
 }
