@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+// ประกาศ jQuery และ Thailand.js สำหรับ TypeScript
+declare var $: any;
 
 // Interface สำหรับข้อมูลผู้มาติดต่อที่บันทึกแล้ว
 interface Visitor {
@@ -21,18 +23,17 @@ interface Visitor {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ ReactiveFormsModule, FormsModule, CommonModule ],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule],
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, AfterViewInit {
   // Form Groups สำหรับจัดการ Input
   registrationForm: FormGroup;
   officerForm: FormGroup;
 
   // State
   visitors: Visitor[] = [
-    // ข้อมูลเริ่มต้นตามที่คุณให้มา
     {
       id: 1,
       idCard: '1809927945130',
@@ -58,11 +59,17 @@ export class RegisterComponent implements OnInit {
       officer: null
     }
   ];
-  
+
   showDepartmentSelection: boolean = false;
   currentVisitorId: number | null = null;
   selectedDepartment: string = '';
   showOfficerInput: boolean = false;
+
+  // ตัวเลือกสำหรับครู
+  selectedTeachers: string[] = [];
+  selectedTeacher: string = '';
+  customTeacherName: string = '';
+  unknownTeacher: boolean = false;
 
   departments: string[] = [
     'สำนักงานผู้อำนวยการ',
@@ -71,14 +78,32 @@ export class RegisterComponent implements OnInit {
     'กลุ่มบริหารทั่วไป',
     'กลุ่มบริหารงบประมาน',
     'ติดต่อ ข้าราชการครู',
-    'นักเรียนนา', // แก้ไขตามรูปภาพ: 'นักเรียน'
-    'ฟอร์ม และ แผ่นคำ', // แก้ไขตามรูปภาพ: 'พ่อค้า และ แม่ค้า'
+    'นักพัฒนา',
+    'พ่อค้า และ แม่ค้า',
     'ร้านค้าสหกรณ์โรงเรียน'
   ];
 
-  // อ้างอิงถึง FormBuilder ใน Constructor
+  // รายชื่อครู
+  teacherList: string[] = [
+    'นายธนากร แก้วมณี',
+    'นายฐาปนา วินิคม',
+    'นางสาวพรศรี มาลาขวัญ',
+    'นางสาววิภาดา สุขใจ',
+    'นายสมชาย ดีเลิศ'
+  ];
+
+  // ตัวแปรสำหรับค้นหาและกรอง
+  searchText: string = '';
+  startDate: string = '';
+  endDate: string = '';
+  sortOrder: 'latest' | 'oldest' = 'latest';
+  filteredVisitors: Visitor[] = [];
+  showDatePicker: boolean = false;
+
+  // ตัวแปรสำหรับเก็บรูปภาพบัตรประชาชน
+  idCardImage: string | null = null;
+
   constructor(private fb: FormBuilder) {
-    // สร้าง Form Group สำหรับข้อมูลผู้มาติดต่อ
     this.registrationForm = this.fb.group({
       idCard: ['', [Validators.required, Validators.pattern('^[0-9]{13}$')]],
       firstName: ['', Validators.required],
@@ -96,53 +121,121 @@ export class RegisterComponent implements OnInit {
       rfid: ['', Validators.required]
     });
 
-    // สร้าง Form Group สำหรับชื่อข้าราชการที่ติดต่อ
     this.officerForm = this.fb.group({
       officerName: ['']
     });
   }
 
   ngOnInit(): void {
-    // กำหนด initial state ของ Officer Input
     this.officerForm.get('officerName')?.setValidators(null);
+    this.filterAndSortVisitors();
+  }
+
+  ngAfterViewInit(): void {
+    this.initThailandJS();
   }
 
   // **********************************
-  // 1. Logic การบันทึกข้อมูลส่วนตัว (Step 1)
+  // ฟังก์ชันจัดการรูปภาพ
+  // **********************************
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+
+    if (file) {
+      // ตรวจสอบประเภทไฟล์
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น');
+        event.target.value = ''; // Reset input
+        return;
+      }
+
+      // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        alert('ขนาดไฟล์ใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB');
+        event.target.value = ''; // Reset input
+        return;
+      }
+
+      // อ่านไฟล์และแปลงเป็น Base64
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.idCardImage = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // ฟังก์ชันลบรูป
+  removeImage(event: Event): void {
+    event.stopPropagation(); // ป้องกันไม่ให้เปิด file dialog
+    this.idCardImage = null;
+  }
+
+  // **********************************
+  // ฟังก์ชันเริ่มต้น Thailand.js
+  // **********************************
+  initThailandJS(): void {
+    if (typeof $ !== 'undefined' && $.Thailand) {
+      $.Thailand({
+        $district: $('#subDistrict'),
+        $amphoe: $('#district'),
+        $province: $('#province'),
+        onDataFill: (data: any) => {
+          this.registrationForm.patchValue({
+            subDistrict: data.district,
+            district: data.amphoe,
+            province: data.province
+          });
+        }
+      });
+    }
+  }
+
+  // **********************************
+  // Logic การบันทึกข้อมูลส่วนตัว (Step 1)
   // **********************************
   handleSubmit(): void {
     if (this.registrationForm.invalid) {
       alert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
-      this.registrationForm.markAllAsTouched(); // แสดง error message ทั้งหมด
+      this.registrationForm.markAllAsTouched();
       return;
     }
 
-    // กำหนด ID ผู้มาติดต่อคนปัจจุบัน และแสดงส่วนเลือกส่วนงาน
     this.currentVisitorId = this.visitors.length + 1;
     this.showDepartmentSelection = true;
-    
-    // เลื่อนหน้าจอไปที่ส่วนเลือกส่วนงาน
+
     setTimeout(() => {
-      document.getElementById('department-section')?.scrollIntoView({ behavior: 'smooth' });
+      const element = document.querySelector('[data-section="department"]');
+      element?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
 
   // **********************************
-  // 2. Logic การเลือกส่วนงาน (Step 2)
+  // Logic การเลือกส่วนงาน (Step 2)
   // **********************************
   handleDepartmentSelect(dept: string): void {
     this.selectedDepartment = dept;
     this.showOfficerInput = dept === 'ติดต่อ ข้าราชการครู';
 
-    // ถ้าเลือก 'ติดต่อ ข้าราชการครู' ต้องกรอกชื่อ จึงกำหนด Validators
-    if (this.showOfficerInput) {
-      this.officerForm.get('officerName')?.setValidators(Validators.required);
-    } else {
-      // ถ้าไม่ได้เลือก ให้ลบ Validators และค่าออก
+    // Reset ค่าเมื่อเปลี่ยนส่วนงาน
+    this.selectedTeacher = '';
+    this.customTeacherName = '';
+    this.unknownTeacher = false;
+
+    if (!this.showOfficerInput) {
       this.officerForm.get('officerName')?.setValidators(null);
       this.officerForm.patchValue({ officerName: '' });
+      this.officerForm.get('officerName')?.updateValueAndValidity();
     }
-    this.officerForm.get('officerName')?.updateValueAndValidity();
+  }
+
+  // เลือกครูจากรายชื่อ
+  selectTeacher(teacher: string): void {
+    this.selectedTeacher = teacher;
+    this.customTeacherName = '';
+    this.unknownTeacher = false;
   }
 
   handleSaveDepartment(): void {
@@ -150,76 +243,244 @@ export class RegisterComponent implements OnInit {
       alert('กรุณาเลือกส่วนงานที่ต้องการติดต่อ');
       return;
     }
-    
-    // ตรวจสอบชื่อข้าราชการถ้ามีการเลือก 'ติดต่อ ข้าราชการครู'
-    if (this.showOfficerInput && this.officerForm.invalid) {
-      alert('กรุณากรอกชื่อข้าราชการที่ต้องการติดต่อ');
-      this.officerForm.markAllAsTouched();
-      return;
+
+    if (this.showOfficerInput) {
+      if (!this.selectedTeacher && !this.customTeacherName && !this.unknownTeacher) {
+        alert('กรุณาเลือกครูที่ต้องการติดต่อ หรือกรอกชื่อครู หรือเลือก "ไม่ทราบชื่อ"');
+        return;
+      }
     }
 
     const now = new Date();
-    // แปลงวันที่เป็นรูปแบบ 'DD/MM/YYYY HH:mm:ss'
     const registeredAt = now.toLocaleDateString('th-TH', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).replace(' ', ''); // ลบช่องว่างที่อาจมีจากการแปลง (เช่น '08/09/2568, 14:14:52' -> '08/09/256814:14:52')
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }) + ' ' + now.toLocaleTimeString('th-TH', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+
+    let officerName: string | null = null;
+    if (this.selectedTeacher) {
+      officerName = this.selectedTeacher;
+    } else if (this.customTeacherName) {
+      officerName = this.customTeacherName;
+    } else if (this.unknownTeacher) {
+      officerName = 'ไม่ทราบชื่อ';
+    }
 
     const formData = this.registrationForm.value;
+
+    // ✅ จัดรูปแบบวันเกิด (YYYY-MM-DD → DD/MM/YY)
+    let formattedBirthDate = '';
+    if (formData.birthDate) {
+      const birthDate = new Date(formData.birthDate);
+      const day = String(birthDate.getDate()).padStart(2, '0');
+      const month = String(birthDate.getMonth() + 1).padStart(2, '0');
+      const year = String(birthDate.getFullYear() + 543).slice(-2); // แปลงเป็น พ.ศ. 2 หลัก
+      formattedBirthDate = `${day}/${month}/${year}`;
+    }
+
+    // ✅ จัดรูปแบบเบอร์โทร (0812345678 → 081-2345678)
+    let formattedPhone = formData.phone;
+    if (formData.phone && formData.phone.length === 10) {
+      formattedPhone = formData.phone.substring(0, 3) + '-' + formData.phone.substring(3);
+    }
+
+    // ✅ จัดรูปแบบที่อยู่แบบสวยงาม
+    let addressParts: string[] = [];
+
+    // บ้านเลขที่
+    if (formData.houseNumber) {
+      addressParts.push(formData.houseNumber);
+    }
+
+    // หมู่
+    if (formData.moo) {
+      addressParts.push('ม.' + formData.moo);
+    }
+
+    // ซอย
+    if (formData.soi) {
+      addressParts.push('ซ.' + formData.soi);
+    }
+
+    // ถนน
+    if (formData.road) {
+      addressParts.push('ถ.' + formData.road);
+    }
+
+    // ตำบล
+    if (formData.subDistrict) {
+      addressParts.push('ต.' + formData.subDistrict);
+    }
+
+    const formattedAddress = addressParts.join(' ') + '...';
+
     const newVisitor: Visitor = {
       id: this.currentVisitorId!,
       idCard: formData.idCard,
       name: `${formData.firstName} ${formData.lastName}`,
-      birthDate: formData.birthDate,
-      phone: formData.phone,
-      address: `${formData.houseNumber}${formData.moo ? ' ม.' + formData.moo : ''}${formData.soi ? ' ซ.' + formData.soi : ''} ${formData.subDistrict}...`,
+      birthDate: formattedBirthDate, // ใช้รูปแบบใหม่
+      phone: formattedPhone, // ใช้รูปแบบใหม่
+      address: formattedAddress, // ใช้รูปแบบใหม่
       rfid: formData.rfid,
       registeredAt: registeredAt,
       department: this.selectedDepartment,
-      officer: this.showOfficerInput ? this.officerForm.get('officerName')?.value : null
+      officer: officerName
     };
 
-    // เพิ่มผู้มาติดต่อใหม่ที่ด้านหน้าของ Array
     this.visitors = [newVisitor, ...this.visitors];
-    
-    // Reset State และ Form
+
+    // Reset ทุกอย่างรวมถึงรูปภาพ
+    this.idCardImage = null;
     this.registrationForm.reset();
     this.officerForm.reset();
-    this.registrationForm.get('province')?.setValue(''); // กำหนดค่าว่างให้ select
+    this.registrationForm.get('province')?.setValue('');
     this.showDepartmentSelection = false;
     this.selectedDepartment = '';
     this.showOfficerInput = false;
     this.currentVisitorId = null;
-    
-    // เลื่อนหน้าจอไปที่ส่วนรายการผู้มาติดต่อ
+    this.selectedTeacher = '';
+    this.customTeacherName = '';
+    this.unknownTeacher = false;
+
+    this.filterAndSortVisitors();
+
     setTimeout(() => {
-      document.getElementById('visitor-list-section')?.scrollIntoView({ behavior: 'smooth' });
+      this.initThailandJS();
+    }, 100);
+
+    setTimeout(() => {
+      const element = document.querySelector('[data-section="visitor-list"]');
+      element?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
 
   // **********************************
-  // 3. Utility Function
+  // Utility Function
   // **********************************
   getCurrentVisitorMessage(): string {
     const now = new Date();
-    // แปลงวันที่ให้เป็นรูปแบบไทย
     const thaiDate = now.toLocaleDateString('th-TH', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric' // ปี พ.ศ.
+      year: 'numeric'
     });
     const time = now.toLocaleTimeString('th-TH', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false // 24-hour format
+      hour12: false
     });
 
-    // ใช้ this.currentVisitorId ที่ถูกกำหนดค่าแล้ว
     return `ผู้มาติดต่อที่ ${this.currentVisitorId} วันที่ ${thaiDate} เวลาเข้ามาติดต่อ รปภ. ${time} น.`;
+  }
+
+  // **********************************
+  // ฟังก์ชันค้นหาและกรอง
+  // **********************************
+  filterAndSortVisitors(): void {
+    let filtered = [...this.visitors];
+
+    if (this.searchText) {
+      const searchLower = this.searchText.toLowerCase();
+      filtered = filtered.filter(v =>
+        v.name.toLowerCase().includes(searchLower) ||
+        v.idCard.includes(searchLower)
+      );
+    }
+
+    if (this.startDate || this.endDate) {
+      filtered = filtered.filter(v => {
+        const visitorDate = this.parseThaiDate(v.registeredAt);
+        if (!visitorDate) return true;
+
+        if (this.startDate && this.endDate) {
+          const start = new Date(this.startDate);
+          const end = new Date(this.endDate);
+          return visitorDate >= start && visitorDate <= end;
+        } else if (this.startDate) {
+          const start = new Date(this.startDate);
+          return visitorDate >= start;
+        } else if (this.endDate) {
+          const end = new Date(this.endDate);
+          return visitorDate <= end;
+        }
+        return true;
+      });
+    }
+
+    filtered.sort((a, b) => {
+      const dateA = this.parseThaiDate(a.registeredAt);
+      const dateB = this.parseThaiDate(b.registeredAt);
+
+      if (!dateA || !dateB) return 0;
+
+      if (this.sortOrder === 'latest') {
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        return dateA.getTime() - dateB.getTime();
+      }
+    });
+
+    this.filteredVisitors = filtered;
+  }
+
+  parseThaiDate(dateStr: string): Date | null {
+    try {
+      const parts = dateStr.split(' ');
+      if (parts.length < 2) return null;
+
+      const datePart = parts[0].split('/');
+      const timePart = parts[1].split(':');
+
+      if (datePart.length < 3 || timePart.length < 3) return null;
+
+      const day = parseInt(datePart[0]);
+      const month = parseInt(datePart[1]) - 1;
+      const year = parseInt(datePart[2]) - 543;
+      const hour = parseInt(timePart[0]);
+      const minute = parseInt(timePart[1]);
+      const second = parseInt(timePart[2]);
+
+      return new Date(year, month, day, hour, minute, second);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'latest' ? 'oldest' : 'latest';
+    this.filterAndSortVisitors();
+  }
+
+  toggleDatePicker(): void {
+    this.showDatePicker = !this.showDatePicker;
+  }
+
+  closeDatePicker(): void {
+    this.showDatePicker = false;
+  }
+
+  applyDateFilter(): void {
+    this.filterAndSortVisitors();
+    this.closeDatePicker();
+  }
+
+  clearDateFilter(): void {
+    this.startDate = '';
+    this.endDate = '';
+    this.filterAndSortVisitors();
+    this.closeDatePicker();
+  }
+
+  clearFilters(): void {
+    this.searchText = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.filterAndSortVisitors();
   }
 }
