@@ -2,14 +2,10 @@
   <div class="max-w-4xl mx-auto space-y-4">
 
     <!-- Header -->
-    <div class="rounded-lg p-4 flex items-center justify-center gap-3" style="background-color: #2E50BC;">
-      <div class="bg-white rounded-full p-2">
-        <div class="w-6 h-6 flex items-center justify-center" style="color: #2E50BC;">
-          <i class="fas fa-user-plus text-xl"></i>
-        </div>
-      </div>
-      <h1 class="text-lg font-bold text-white">ลงทะเบียนสำหรับผู้มาติดต่อ</h1>
-    </div>
+    <div class="header">
+  <i class="fas fa-user-plus"></i>
+  <h1>ลงทะเบียนสำหรับผู้มาติดต่อ</h1>
+</div>
 
     <!-- Form Section -->
     <form [formGroup]="registrationForm" (ngSubmit)="handleSubmit()" class="bg-white rounded-lg shadow-lg p-6">
@@ -213,7 +209,7 @@
 
           <!-- รายชื่อครูให้เลือก -->
           <div class="ml-5 mb-4">
-            <p class="text-sm font-medium mb-2">เลือกครูที่ต้องการติดต่อ:</p>
+            <p class="text-sm font-medium mb-2">เลือกครูที่ต้องการติดต่อ</p>
             <div class="space-y-2">
               <label *ngFor="let teacher of teacherList"
                 class="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded">
@@ -231,7 +227,7 @@
                 (change)="selectedTeacher = ''; unknownTeacher = false" class="w-4 h-4 mt-0.5"
                 style="accent-color: #2E50BC;" />
               <div class="flex-1">
-                <span class="text-sm font-medium block mb-2">กรอกชื่อครูเอง:</span>
+                <span class="text-sm font-medium block mb-2">กรอกชื่อครู</span>
                 <input type="text" [(ngModel)]="customTeacherName" [ngModelOptions]="{standalone: true}"
                   (focus)="selectedTeacher = ''; unknownTeacher = false" placeholder="พิมพ์ชื่อ-สกุล ข้าราชการครู"
                   class="w-2/3 border border-gray-300 rounded px-3 py-2 text-sm" />
@@ -320,7 +316,7 @@
         <table class="w-full text-sm">
           <thead style="background-color: #FBB903;">
             <tr>
-              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">#</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">ที่</th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">เลขบัตรประชาชน</th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">ชื่อ-สกุล</th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">วันเกิด</th>

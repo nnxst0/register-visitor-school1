@@ -1,7 +1,13 @@
+/* Wrapper - Full Screen Background */
+.export-wrapper {
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
+}
+
 .export-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 /* Header */
@@ -9,7 +15,7 @@
   background: linear-gradient(135deg, #2E50BC 0%, #3d63d4 100%);
   color: white;
   padding: 12px 25px;
-  border-radius: 15px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -30,10 +36,11 @@
 
 /* Form Section */
 .form-section {
-  background-color: #A2DCE7;
-  border-radius: 15px;
+  background-color: white;
+  border-radius: 10px;
   padding: 30px;
   margin-bottom: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .form-section h2 {
@@ -71,11 +78,17 @@
 .filter-input {
   width: 100%;
   padding: 12px 40px 12px 15px;
-  border: none;
+  border: 2px solid #a3a2a2;
   border-radius: 8px;
   font-size: 16px;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.form-control:focus,
+.filter-input:focus {
+  border-color: #2E50BC;
+  box-shadow: 0 0 0 1px #2E50BC;
 }
 
 .date-input-wrapper input[type="date"] {
@@ -110,12 +123,17 @@
   appearance: none;
   width: 100%;
   padding: 12px 40px 12px 15px;
-  border: none;
+  border: 2px solid #a3a2a2;
   border-radius: 8px;
   font-size: 16px;
   background-color: white;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.select-wrapper select:focus {
+  border-color: #2E50BC;
+  box-shadow: 0 0 0 1px #2E50BC;
 }
 
 /* Form Footer */
@@ -181,9 +199,10 @@
 
 /* History Section */
 .history-section {
-  background-color: #A2DCE7;
-  border-radius: 15px;
+  background-color: white;
+  border-radius: 10px;
   padding: 30px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .history-header {
@@ -223,10 +242,15 @@
   align-items: center;
   gap: 0;
   background-color: white;
+  border: 2px solid #a3a2a2;
   border-radius: 8px;
   padding: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: 44px;
+}
+
+.date-range-filter:focus-within {
+  border-color: #2E50BC;
+  box-shadow: 0 0 0 1px #2E50BC;
 }
 
 .date-filter {
@@ -245,19 +269,6 @@
   padding-right: 0;
 }
 
-/* Placeholder แบบ Custom */
-.date-placeholder {
-  position: absolute;
-  left: 12px;
-  color: #9ca3af;
-  font-size: 15px;
-  font-family: 'Mitr', sans-serif;
-  pointer-events: none;
-  z-index: 0;
-  background-color: white;
-  padding-right: 5px;
-}
-
 .date-filter input[type="date"] {
   padding: 12px 35px 12px 12px;
   width: 170px;
@@ -274,12 +285,10 @@
   z-index: 1;
 }
 
-/* แสดงสีเมื่อมีค่า */
 .date-filter input[type="date"]:valid {
   color: #2E50BC;
 }
 
-/* ซ่อนข้อความวันที่เมื่อยังไม่ได้เลือก */
 .date-filter input[type="date"]:invalid {
   color: transparent;
 }
@@ -350,13 +359,18 @@
 .sort-filter {
   position: relative;
   background-color: white;
+  border: 2px solid #a3a2a2;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 48px;
   min-width: 160px;
   cursor: pointer;
+}
+
+.sort-filter:focus-within {
+  border-color: #2E50BC;
+  box-shadow: 0 0 0 1px #2E50BC;
 }
 
 .sort-icon {
@@ -371,7 +385,7 @@
 .filter-select {
   width: 100%;
   height: 100%;
-  padding: 10px 40px 10px 45px;
+  padding: 8px 40px 12px 45px;
   border: none;
   background: transparent;
   font-size: 16px;
@@ -381,6 +395,7 @@
   font-weight: 500;
   font-family: 'Mitr', sans-serif;
   outline: none;
+  line-height: 1.6;
 }
 
 .filter-select:focus {
@@ -425,25 +440,45 @@
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.2s ease;
 }
+/* เพิ่มตรงนี้ */
+.history-table tbody tr:nth-child(odd) {
+  background-color: #E8F4F8;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: white;
+}
 
 .history-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: #c8d9e9;
 }
 
 .history-table td {
   padding: 18px 15px;
   color: #2E50BC;
   font-size: 15px;
+  text-align: left;
+}
+
+.status-success,
+.status-error {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 30px;
+  font-weight: 400;
+  font-size: 14px;
+  text-align: center;
+  min-width: 75px;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .status-success {
-  color: #16a34a;
-  font-weight: 500;
+  background-color: #49E700;
 }
 
 .status-error {
-  color: #dc2626;
-  font-weight: 500;
+  background-color: #FB2323;
 }
 
 /* Responsive */
