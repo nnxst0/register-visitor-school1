@@ -3,13 +3,14 @@
 
     <!-- Header -->
     <div class="header">
-  <i class="fas fa-user-plus"></i>
-  <h1>ลงทะเบียนสำหรับผู้มาติดต่อ</h1>
-</div>
+      <i class="fas fa-user-plus"></i>
+      <h1>ลงทะเบียนสำหรับผู้มาติดต่อ</h1>
+    </div>
 
     <!-- Form Section -->
     <form [formGroup]="registrationForm" (ngSubmit)="handleSubmit()" class="bg-white rounded-lg shadow-lg p-6">
-      <div class="rounded-full px-6 py-2 inline-block mb-6 text-white font-medium" style="background-color: #2E50BC;">
+      <div class="rounded-full px-6 py-2 inline-block mb-6 text-white font-medium"
+        style="background-color: #2E50BC; font-size: 1rem;">
         ข้อมูลผู้มาติดต่อ
       </div>
 
@@ -317,7 +318,8 @@
           <thead style="background-color: #FBB903;">
             <tr>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">ที่</th>
-              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">เลขบัตรประชาชน</th>
+              <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">เลขบัตรประชาชน
+              </th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">ชื่อ-สกุล</th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">วันเกิด</th>
               <th class="px-3 py-2 text-left font-semibold border-b border-gray-300 text-white font-xl">เบอร์</th>

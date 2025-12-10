@@ -1,12 +1,16 @@
 /* Wrapper - Full Screen Background */
 .export-wrapper {
   min-height: 100vh;
-  padding: 1rem;
+  padding: 2rem;
   background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
+  font-family: 'mitr', sans-serif;
+  flex-direction: column;
+  align-items: center;
 }
 
 .export-container {
-  max-width: 1200px;
+  width: 100%;  /* เต็มความกว้าง */
+  max-width: none;  /* ไม่มีขีดจำกัด */
   margin: 0 auto;
 }
 
