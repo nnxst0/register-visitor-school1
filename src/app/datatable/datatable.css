@@ -5,9 +5,7 @@
   margin: 0 auto;
   padding: 20px;
 }
-.bg-gradient {
-  background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
-}
+
 
 /* Header Title (แถบสีน้ำเงินเข้มด้านบน) */
 .header-title {
@@ -24,9 +22,13 @@
 }
 
 .header-title h1 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: bold;
+   margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .icon-wrapper svg {
@@ -35,7 +37,7 @@
 
 /* Content Box (กล่องสีฟ้าอ่อน) */
 .content-box {
-  background-color: #ffffff89; /* สีพื้นหลังฟ้าอ่อน */
+  background-color: #A2DCE7; /* สีพื้นหลังฟ้าอ่อน */
   padding: 20px;
   border-radius: 10px;
   min-height: 500px;
@@ -52,7 +54,7 @@
 
 .filter-group {
   position: relative;
-  background-color: rgb(143, 233, 255);
+  background-color: #8fe9ff;
   border-radius: 20px;
   display: flex;
   align-items: center;

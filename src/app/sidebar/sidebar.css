@@ -108,3 +108,24 @@
   outline-offset: 3px;
   border-radius: 8px;
 }
+.body-content {
+  /* ความกว้างปกติของ Sidebar (ตอนกางออก) */
+  margin-left: 16.5625rem; 
+  
+  /* ให้เวลาขยับเท่ากับ Sidebar (0.5s ease) จะได้ลื่นไหลไปพร้อมกัน */
+  transition: all 0.5s ease; 
+  
+  padding: 20px; /* ระยะห่างเนื้อหาจากขอบบน/ซ้าย */
+  
+  /* จัดการเนื้อหาภายใน (Optional) */
+  width: auto;
+}
+
+/* เมื่อเมนูหด (Collapsed) */
+.body-trimmed {
+  /* ความกว้างของ Sidebar (ตอนหด) */
+  margin-left: 5rem; 
+}
+
+/* (Optional) ถ้าอยากให้เนื้อหาอยู่ตรงกลางจอเป๊ะๆ เวลาพื้นที่เหลือเยอะ */
+/* แต่ปกติ Dashboard นิยมชิดซ้ายแล้วเว้น margin เอาครับ */

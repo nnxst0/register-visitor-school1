@@ -1,0 +1,101 @@
+<div class="main-container">
+  
+  <header class="top-header">
+    <h1><i class="fas fa-credit-card"></i> คืนบัตร RFID</h1>
+  </header>
+
+  <div class="card-section">
+    <div class="card-title-pill">คืนบัตร</div>
+
+    <div class="search-area">
+      <label><i class="fas fa-id-card"></i> สแกนบัตร RFID</label>
+      <div class="input-group">
+        <input type="text" 
+               [(ngModel)]="searchInput" 
+               (keyup.enter)="onSearch()"
+               placeholder="สแกนหรือพิมพ์รหัสบัตร RFID......">
+        <button class="btn-search" (click)="onSearch()">ค้นหา</button>
+      </div>
+    </div>
+
+    <div class="result-area" *ngIf="activeCard">
+      <div class="card-code-display">
+        <div class="label">รหัสบัตร</div>
+        <div class="value-box">{{ activeCard.id }}</div>
+      </div>
+
+      <div class="info-table">
+        <div class="info-header">
+          <div>ชื่อ-นามสกุล</div>
+          <div>เวลาเข้า</div>
+          <div>เวลาออก</div>
+        </div>
+        <div class="info-row">
+          <div class="text-name">{{ activeCard.name }}</div>
+          <div>{{ activeCard.checkIn }}</div>
+          <div>{{ activeCard.checkOut }}</div>
+        </div>
+      </div>
+
+      <div class="action-area">
+        <button class="btn-return" (click)="onReturnCard()">คืนบัตร</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-section">
+    <div class="history-header">
+      <div class="title">
+        <i class="fas fa-history"></i> ประวัติการคืนบัตร
+      </div>
+      <div class="filters">
+        <div class="filter-search">
+           <i class="fas fa-search"></i>
+           <input type="text" placeholder="ค้นหาบัตร">
+        </div>
+        <div class="filter-date">
+          <span>ช่วงวันที่</span> <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="filter-sort">
+          <span>เรียง</span> <i class="fas fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-no">ที่</th>
+            <th>รหัสบัตร</th>
+            <th>ชื่อ-สกุล</th>
+            <th>เวลาเข้า</th>
+            <th>เวลาออก</th>
+            <th>วันที่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of historyList; let i = index">
+            <td class="col-no">{{ item.no }}</td> <td class="col-code">{{ item.cardId }}</td>
+            <td class="col-name">{{ item.name }}</td>
+            <td class="col-time">{{ item.timeIn }}</td>
+            <td class="col-time">{{ item.timeOut }}</td>
+            <td class="col-date">{{ item.date }}</td>
+            <td>
+              <span class="status-badge success">{{ item.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="empty-rows">
+         <div class="empty-row"></div>
+         <div class="empty-row"></div>
+         <div class="empty-row"></div>
+         <div class="empty-row"></div>
+      </div>
+    </div>
+  </div>
+
+</div>

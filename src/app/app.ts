@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { Sidebar } from './sidebar/sidebar';
-import { Main } from './main/main';
+import { Maincomponent } from './main/main';
 import { CommonModule } from '@angular/common';
 import { HostListener } from '@angular/core';
 
@@ -9,7 +8,7 @@ import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, Main, CommonModule,  ],
+  imports: [Sidebar, Maincomponent, CommonModule,  ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

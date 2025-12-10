@@ -5,12 +5,13 @@ import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [RouterModule ,CommonModule, NgClass],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
-   isSidebarCollapsed = input.required<boolean>();
+  SidebarCollapsed = input.required<boolean>();
   changeIsSidebarCollapsed = output<boolean>();
   items = [
     {
@@ -24,7 +25,7 @@ export class Sidebar {
       label: 'ข้อมูลผู้ติดต่อ',
     },
     {
-      routeLink: 'card',
+      routeLink: 'return-card',
       icon: 'bi bi-person-vcard-fill',
       label: 'คืนบัตร',
     },
@@ -36,7 +37,7 @@ export class Sidebar {
   ];
 
   toggleCollapse(): void {
-    this.changeIsSidebarCollapsed.emit(!this.isSidebarCollapsed());
+    this.changeIsSidebarCollapsed.emit(!this.SidebarCollapsed());
   }
 
   closeSidenav(): void {

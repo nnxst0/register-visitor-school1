@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Maincomponent } from './main';
+import { ReturnCard } from './return-card';
 
-describe('Main', () => {
-  let component: Maincomponent;
-  let fixture: ComponentFixture<Maincomponent>;
+describe('ReturnCard', () => {
+  let component: ReturnCard;
+  let fixture: ComponentFixture<ReturnCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Maincomponent]
+      imports: [ReturnCard]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Maincomponent);
+    fixture = TestBed.createComponent(ReturnCard);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

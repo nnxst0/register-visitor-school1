@@ -9,11 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router'
 import { Router } from '@angular/router';
 
-// สร้าง Interface สำหรับข้อมูล (Type Safety)
 interface Visitor {
   id: number;
   name: string;
-  date: string; // ในโปรเจกต์จริงอาจใช้ Date object
+  date: string; 
   timeIn: string;
   timeOut: string;
   department: string;
@@ -31,7 +30,7 @@ interface Visitor {
             MatDatepickerModule,
             MatNativeDateModule ,
             MatIconModule,
-            RouterLink], // Import module ที่จำเป็น
+            RouterLink], 
   templateUrl: './datatable.html',
   styleUrls: ['./datatable.css']
 })
@@ -39,8 +38,6 @@ export class DatatableComponent {
 
   startDate: Date | null = null;
   endDate: Date | null = null;
-  // จำลองข้อมูลตามรูปภาพ (Mock Data)
-  // ใช้ Signal สำหรับ State Management แบบใหม่
   visitors = signal<Visitor[]>([
     {
       id: 1,
@@ -84,17 +81,12 @@ export class DatatableComponent {
     }
   ]);
 
-  // ตัวแปรสำหรับ Date Filter (Mock
-
 
   viewImage(id: number) {
     alert(`ดูรูปภาพของ ID: ${id}`);
   }
-
-  // 2. ฉีด (Inject) Router เข้ามาใช้งาน
   constructor(private router: Router) {}
 
-  // 3. ฟังก์ชันสำหรับปุ่มกด
   addVisitor() {
     this.router.navigate(['/register']);
   }
