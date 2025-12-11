@@ -51,7 +51,7 @@
 
 .filter-group {
   position: relative;
-  background-color: #8fe9ff;
+  background-color: #caf4ff;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -86,7 +86,7 @@
 
 /* Table Styles */
 .table-responsive {
-  background-color: #d9f3fa;
+  background-color: #e9f9ff;
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 20px;
