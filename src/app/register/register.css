@@ -493,3 +493,94 @@ th, td {
 .date-input:focus:before {
   content: none;
 }
+
+/* Custom styles for SweetAlert2 confirmation dialog */
+.swal-wide {
+  max-width: 650px !important;
+}
+
+.swal2-popup {
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+.swal2-html-container {
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+/* Table styles inside SweetAlert */
+.swal2-html-container table {
+  font-size: 14px;
+}
+
+.swal2-html-container table td {
+  vertical-align: top;
+}
+
+.swal2-html-container table td:first-child {
+  width: 180px;
+  color: #666;
+}
+
+.swal2-html-container table td:last-child {
+  color: #2E50BC;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .swal-wide {
+    max-width: 95% !important;
+  }
+  
+  .swal2-html-container table {
+    font-size: 12px;
+  }
+  
+  .swal2-html-container table td:first-child {
+    width: 120px;
+  }
+}
+
+/* Original styles */
+.bg-color {
+  background-color: #E8F4F8;
+}
+
+.header {
+  background-color: #2E50BC;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.hover-opacity-90:hover {
+  opacity: 0.9;
+}
+
+.hover-bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+/* Date input placeholder styling */
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.date-input:not(:focus):not([value]):before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+}
+
+.date-input:not(:focus):not([value]) {
+  color: transparent;
+}
+
+.date-input[value]:before {
+  content: none;
+}

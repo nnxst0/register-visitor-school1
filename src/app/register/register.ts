@@ -32,6 +32,9 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   registrationForm: FormGroup;
   officerForm: FormGroup;
 
+  // Declare SweetAlert2
+  private Swal: any;
+
   // State
   visitors: Visitor[] = [
     {
@@ -108,16 +111,16 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       idCard: ['', [Validators.required, Validators.pattern('^[0-9]{13}$')]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      birthDate: ['', Validators.required],
+      birthDate: [''],
       phone: ['', Validators.required],
       licensePlate: [''],
-      houseNumber: ['', Validators.required],
+      houseNumber: [''],
       moo: [''],
       soi: [''],
       road: [''],
-      subDistrict: ['', Validators.required],
-      district: ['', Validators.required],
-      province: ['', Validators.required],
+      subDistrict: [''],
+      district: [''],
+      province: [''],
       rfid: ['', Validators.required]
     });
 
@@ -129,6 +132,21 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.officerForm.get('officerName')?.setValidators(null);
     this.filterAndSortVisitors();
+    this.loadSweetAlert();
+  }
+
+  // Load SweetAlert2
+  loadSweetAlert(): void {
+    if (typeof (window as any).Swal !== 'undefined') {
+      this.Swal = (window as any).Swal;
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+      script.onload = () => {
+        this.Swal = (window as any).Swal;
+      };
+      document.head.appendChild(script);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -145,7 +163,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       // ตรวจสอบประเภทไฟล์
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!allowedTypes.includes(file.type)) {
-        alert('กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น');
+        this.showWarningAlert('กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น');
         event.target.value = ''; // Reset input
         return;
       }
@@ -153,7 +171,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        alert('ขนาดไฟล์ใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB');
+        this.showWarningAlert('ขนาดไฟล์ใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB');
         event.target.value = ''; // Reset input
         return;
       }
@@ -171,6 +189,53 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   removeImage(event: Event): void {
     event.stopPropagation(); // ป้องกันไม่ให้เปิด file dialog
     this.idCardImage = null;
+  }
+
+  // **********************************
+  // SweetAlert2 Functions
+  // **********************************
+  showErrorAlert(message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: message,
+        confirmButtonText: 'ตรวจสอบอีกครั้ง',
+        confirmButtonColor: '#d33'
+      });
+    } else {
+      alert(message);
+    }
+  }
+
+  showSuccessAlert(title: string, message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'success',
+        title: title,
+        text: message,
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#4CAF50',
+        timer: 2000,
+        timerProgressBar: true
+      });
+    } else {
+      alert(title + ': ' + message);
+    }
+  }
+
+  showWarningAlert(message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'warning',
+        title: 'คำเตือน',
+        text: message,
+        confirmButtonText: 'รับทราบ',
+        confirmButtonColor: '#FBB903'
+      });
+    } else {
+      alert(message);
+    }
   }
 
   // **********************************
@@ -198,7 +263,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   // **********************************
   handleSubmit(): void {
     if (this.registrationForm.invalid) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
+      this.showErrorAlert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
       this.registrationForm.markAllAsTouched();
       return;
     }
@@ -240,13 +305,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
   handleSaveDepartment(): void {
     if (!this.selectedDepartment) {
-      alert('กรุณาเลือกส่วนงานที่ต้องการติดต่อ');
+      this.showErrorAlert('กรุณาเลือกส่วนงานที่ต้องการติดต่อ');
       return;
     }
 
     if (this.showOfficerInput) {
       if (!this.selectedTeacher && !this.customTeacherName && !this.unknownTeacher) {
-        alert('กรุณาเลือกครูที่ต้องการติดต่อ หรือกรอกชื่อครู หรือเลือก "ไม่ทราบชื่อ"');
+        this.showErrorAlert('กรุณาเลือกครูที่ต้องการติดต่อ หรือกรอกชื่อครู หรือเลือก "ไม่ทราบชื่อ"');
         return;
       }
     }
@@ -274,13 +339,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
     const formData = this.registrationForm.value;
 
-    // ✅ จัดรูปแบบวันเกิด (YYYY-MM-DD → DD/MM/YY)
-    let formattedBirthDate = '';
+    // ✅ จัดรูปแบบวันเกิด (YYYY-MM-DD → DD/MM/YY) หรือ "-"
+    let formattedBirthDate = '-';
     if (formData.birthDate) {
       const birthDate = new Date(formData.birthDate);
       const day = String(birthDate.getDate()).padStart(2, '0');
       const month = String(birthDate.getMonth() + 1).padStart(2, '0');
-      const year = String(birthDate.getFullYear() + 543).slice(-2); // แปลงเป็น พ.ศ. 2 หลัก
+      const year = String(birthDate.getFullYear() + 543).slice(-2);
       formattedBirthDate = `${day}/${month}/${year}`;
     }
 
@@ -290,47 +355,148 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       formattedPhone = formData.phone.substring(0, 3) + '-' + formData.phone.substring(3);
     }
 
-    // ✅ จัดรูปแบบที่อยู่แบบสวยงาม
+    // ✅ จัดรูปแบบที่อยู่แบบสวยงาม หรือ "-"
     let addressParts: string[] = [];
 
-    // บ้านเลขที่
     if (formData.houseNumber) {
       addressParts.push(formData.houseNumber);
     }
 
-    // หมู่
     if (formData.moo) {
       addressParts.push('ม.' + formData.moo);
     }
 
-    // ซอย
     if (formData.soi) {
       addressParts.push('ซ.' + formData.soi);
     }
 
-    // ถนน
     if (formData.road) {
       addressParts.push('ถ.' + formData.road);
     }
 
-    // ตำบล
     if (formData.subDistrict) {
       addressParts.push('ต.' + formData.subDistrict);
     }
 
-    const formattedAddress = addressParts.join(' ') + '...';
+    if (formData.district) {
+      addressParts.push('อ.' + formData.district);
+    }
 
-    const newVisitor: Visitor = {
-      id: this.currentVisitorId!,
+    if (formData.province) {
+      addressParts.push('จ.' + formData.province);
+    }
+
+    const formattedAddress = addressParts.length > 0 ? addressParts.join(' ') : '-';
+    const shortAddress = addressParts.length > 0 ? addressParts.slice(0, 3).join(' ') + '...' : '-';
+
+    // 🔥 แสดง Confirmation Dialog พร้อมรายละเอียดข้อมูล
+    this.showConfirmationDialog({
       idCard: formData.idCard,
       name: `${formData.firstName} ${formData.lastName}`,
-      birthDate: formattedBirthDate, // ใช้รูปแบบใหม่
-      phone: formattedPhone, // ใช้รูปแบบใหม่
-      address: formattedAddress, // ใช้รูปแบบใหม่
+      birthDate: formattedBirthDate,
+      phone: formattedPhone,
+      address: formattedAddress,
       rfid: formData.rfid,
-      registeredAt: registeredAt,
       department: this.selectedDepartment,
-      officer: officerName
+      officer: officerName,
+      registeredAt: registeredAt
+    }, shortAddress);
+  }
+
+  // ฟังก์ชันแสดง Confirmation Dialog
+  showConfirmationDialog(data: any, shortAddress: string): void {
+    if (!this.Swal) {
+      alert('กำลังโหลด SweetAlert2...');
+      return;
+    }
+
+    const htmlContent = `
+      <div style="text-align: left; padding: 10px;">
+        <div style="margin-bottom: 15px;">
+          <strong style="color: #2E50BC;">ข้อมูลผู้มาติดต่อ</strong>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>เลขบัตรประชาชน:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.idCard}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>ชื่อ-สกุล:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>วันเกิด:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.birthDate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>เบอร์โทร:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.phone}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>ที่อยู่:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.address}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>RFID:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.rfid}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>ส่วนงาน:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.department}</td>
+          </tr>
+          ${data.officer ? `
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>ติดต่อ:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${data.officer}</td>
+          </tr>
+          ` : ''}
+          <tr>
+            <td style="padding: 8px;"><strong>วันที่ลงทะเบียน:</strong></td>
+            <td style="padding: 8px;">${data.registeredAt}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 20px; padding: 10px; background-color: #FFF3CD; border-radius: 8px; border-left: 4px solid #FBB903;">
+          <strong>⚠️ โปรดตรวจสอบข้อมูลให้ถูกต้องก่อนยืนยัน</strong>
+        </div>
+      </div>
+    `;
+
+    this.Swal.fire({
+      title: 'ยืนยันการบันทึกข้อมูล',
+      html: htmlContent,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#4CAF50',
+      cancelButtonColor: '#d33',
+      width: '600px',
+      customClass: {
+        popup: 'swal-wide'
+      }
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        // บันทึกข้อมูลจริง
+        this.saveVisitorData(data, shortAddress);
+      }
+    });
+  }
+
+  // ฟังก์ชันบันทึกข้อมูลจริง
+  saveVisitorData(data: any, shortAddress: string): void {
+    const newVisitor: Visitor = {
+      id: this.currentVisitorId!,
+      idCard: data.idCard,
+      name: data.name,
+      birthDate: data.birthDate,
+      phone: data.phone,
+      address: shortAddress,
+      rfid: data.rfid,
+      registeredAt: data.registeredAt,
+      department: data.department,
+      officer: data.officer
     };
 
     this.visitors = [newVisitor, ...this.visitors];
@@ -349,6 +515,9 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     this.unknownTeacher = false;
 
     this.filterAndSortVisitors();
+
+    // แสดง success alert
+    this.showSuccessAlert('บันทึกข้อมูลสำเร็จ!', 'ข้อมูลผู้มาติดต่อถูกบันทึกเรียบร้อยแล้ว');
 
     setTimeout(() => {
       this.initThailandJS();
