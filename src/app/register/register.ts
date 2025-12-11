@@ -1,7 +1,8 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 // ประกาศ jQuery และ Thailand.js สำหรับ TypeScript
 declare var $: any;
@@ -20,6 +21,20 @@ interface Visitor {
   officer: string | null;
 }
 
+// Interface สำหรับ Backend Response
+interface VisitorListResponse {
+  id: number;
+  idCard: string;
+  name: string;
+  birthDate: string;
+  phone: string;
+  address: string;
+  rfid: string;
+  department: string;
+  officerName: string;
+  registeredAt: string;
+}
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -28,6 +43,10 @@ interface Visitor {
   styleUrls: ['./register.css']
 })
 export class RegisterComponent implements OnInit, AfterViewInit {
+  // Inject services
+  private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
+
   // Form Groups สำหรับจัดการ Input
   registrationForm: FormGroup;
   officerForm: FormGroup;
@@ -36,32 +55,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   private Swal: any;
 
   // State
-  visitors: Visitor[] = [
-    {
-      id: 1,
-      idCard: '1809927945130',
-      name: 'วิจิตร ศรีอยู',
-      birthDate: '18/05/46',
-      phone: '084-3574982',
-      address: '84/2 ถ.นางหงษ์ ต.ม...',
-      rfid: 'R001',
-      registeredAt: '08/09/2568 14:14:52',
-      department: null,
-      officer: null
-    },
-    {
-      id: 2,
-      idCard: '1809924972891',
-      name: 'สมบุญ วินิยมา',
-      birthDate: '22/10/46',
-      phone: '093-7849104',
-      address: '857 ถ.นิงลัง ต.มีบอ...',
-      rfid: 'R002',
-      registeredAt: '08/09/2568 15:20:57',
-      department: null,
-      officer: null
-    }
-  ];
+  visitors: Visitor[] = [];
 
   showDepartmentSelection: boolean = false;
   currentVisitorId: number | null = null;
@@ -106,7 +100,10 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   // ตัวแปรสำหรับเก็บรูปภาพบัตรประชาชน
   idCardImage: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  // API URL
+  private apiUrl = 'http://localhost:8080/api/visitors';
+
+  constructor() {
     this.registrationForm = this.fb.group({
       idCard: ['', [Validators.required, Validators.pattern('^[0-9]{13}$')]],
       firstName: ['', Validators.required],
@@ -131,7 +128,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.officerForm.get('officerName')?.setValidators(null);
-    this.filterAndSortVisitors();
+    this.loadVisitors();
     this.loadSweetAlert();
   }
 
@@ -484,49 +481,126 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // ฟังก์ชันบันทึกข้อมูลจริง
+  // ฟังก์ชันบันทึกข้อมูลจริง - ส่งไปยัง Backend
   saveVisitorData(data: any, shortAddress: string): void {
-    const newVisitor: Visitor = {
-      id: this.currentVisitorId!,
-      idCard: data.idCard,
-      name: data.name,
-      birthDate: data.birthDate,
-      phone: data.phone,
-      address: shortAddress,
-      rfid: data.rfid,
-      registeredAt: data.registeredAt,
-      department: data.department,
-      officer: data.officer
+    const formData = this.registrationForm.value;
+
+    // เตรียมข้อมูลสำหรับส่งไป Backend
+    const visitorData = {
+      idCard: formData.idCard,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      birthDate: formData.birthDate || null,
+      phone: formData.phone,
+      licensePlate: formData.licensePlate || '',
+      houseNumber: formData.houseNumber || '',
+      moo: formData.moo || '',
+      soi: formData.soi || '',
+      road: formData.road || '',
+      subDistrict: formData.subDistrict || '',
+      district: formData.district || '',
+      province: formData.province || '',
+      rfid: formData.rfid,
+      department: data.department || '',
+      officerName: data.officer || '',
+      idCardImage: this.idCardImage || ''
     };
 
-    this.visitors = [newVisitor, ...this.visitors];
+    // ส่งข้อมูลไปยัง Backend
+    this.http.post(this.apiUrl, visitorData).subscribe({
+      next: (response: any) => {
+        console.log('บันทึกสำเร็จ:', response);
 
-    // Reset ทุกอย่างรวมถึงรูปภาพ
-    this.idCardImage = null;
-    this.registrationForm.reset();
-    this.officerForm.reset();
-    this.registrationForm.get('province')?.setValue('');
-    this.showDepartmentSelection = false;
-    this.selectedDepartment = '';
-    this.showOfficerInput = false;
-    this.currentVisitorId = null;
-    this.selectedTeacher = '';
-    this.customTeacherName = '';
-    this.unknownTeacher = false;
+        // Reset ทุกอย่างรวมถึงรูปภาพ
+        this.idCardImage = null;
+        this.registrationForm.reset();
+        this.officerForm.reset();
+        this.registrationForm.get('province')?.setValue('');
+        this.showDepartmentSelection = false;
+        this.selectedDepartment = '';
+        this.showOfficerInput = false;
+        this.currentVisitorId = null;
+        this.selectedTeacher = '';
+        this.customTeacherName = '';
+        this.unknownTeacher = false;
 
-    this.filterAndSortVisitors();
+        // โหลดข้อมูลใหม่จาก Backend
+        this.loadVisitors();
 
-    // แสดง success alert
-    this.showSuccessAlert('บันทึกข้อมูลสำเร็จ!', 'ข้อมูลผู้มาติดต่อถูกบันทึกเรียบร้อยแล้ว');
+        // แสดง success alert
+        this.showSuccessAlert('บันทึกข้อมูลสำเร็จ!', 'ข้อมูลผู้มาติดต่อถูกบันทึกเรียบร้อยแล้ว');
 
-    setTimeout(() => {
-      this.initThailandJS();
-    }, 100);
+        setTimeout(() => {
+          this.initThailandJS();
+        }, 100);
 
-    setTimeout(() => {
-      const element = document.querySelector('[data-section="visitor-list"]');
-      element?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+        setTimeout(() => {
+          const element = document.querySelector('[data-section="visitor-list"]');
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      },
+      error: (error) => {
+        console.error('เกิดข้อผิดพลาด:', error);
+        
+        let errorMessage = 'ไม่สามารถบันทึกข้อมูลได้';
+        if (error.error?.error) {
+          errorMessage = error.error.error;
+        }
+        
+        this.showErrorAlert(errorMessage);
+      }
+    });
+  }
+
+  // **********************************
+  // ฟังก์ชันโหลดข้อมูลจาก Backend
+  // **********************************
+  loadVisitors(): void {
+    const params: any = {
+      sortOrder: this.sortOrder
+    };
+
+    if (this.searchText) {
+      params.search = this.searchText;
+    }
+    if (this.startDate) {
+      params.startDate = this.startDate;
+    }
+    if (this.endDate) {
+      params.endDate = this.endDate;
+    }
+
+    // สร้าง query string
+    const queryString = Object.keys(params)
+      .map(key => `${key}=${encodeURIComponent(params[key])}`)
+      .join('&');
+
+    const url = `${this.apiUrl}?${queryString}`;
+
+    this.http.get<VisitorListResponse[]>(url).subscribe({
+      next: (response) => {
+        // แปลง response จาก Backend เป็น Visitor interface
+        this.filteredVisitors = response.map(v => ({
+          id: v.id,
+          idCard: v.idCard,
+          name: v.name,
+          birthDate: v.birthDate,
+          phone: v.phone,
+          address: v.address,
+          rfid: v.rfid,
+          registeredAt: v.registeredAt,
+          department: v.department,
+          officer: v.officerName
+        }));
+        
+        // อัพเดท visitors array ด้วย
+        this.visitors = this.filteredVisitors;
+      },
+      error: (error) => {
+        console.error('เกิดข้อผิดพลาดในการโหลดข้อมูล:', error);
+        this.filteredVisitors = [];
+      }
+    });
   }
 
   // **********************************
@@ -552,50 +626,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   // ฟังก์ชันค้นหาและกรอง
   // **********************************
   filterAndSortVisitors(): void {
-    let filtered = [...this.visitors];
-
-    if (this.searchText) {
-      const searchLower = this.searchText.toLowerCase();
-      filtered = filtered.filter(v =>
-        v.name.toLowerCase().includes(searchLower) ||
-        v.idCard.includes(searchLower)
-      );
-    }
-
-    if (this.startDate || this.endDate) {
-      filtered = filtered.filter(v => {
-        const visitorDate = this.parseThaiDate(v.registeredAt);
-        if (!visitorDate) return true;
-
-        if (this.startDate && this.endDate) {
-          const start = new Date(this.startDate);
-          const end = new Date(this.endDate);
-          return visitorDate >= start && visitorDate <= end;
-        } else if (this.startDate) {
-          const start = new Date(this.startDate);
-          return visitorDate >= start;
-        } else if (this.endDate) {
-          const end = new Date(this.endDate);
-          return visitorDate <= end;
-        }
-        return true;
-      });
-    }
-
-    filtered.sort((a, b) => {
-      const dateA = this.parseThaiDate(a.registeredAt);
-      const dateB = this.parseThaiDate(b.registeredAt);
-
-      if (!dateA || !dateB) return 0;
-
-      if (this.sortOrder === 'latest') {
-        return dateB.getTime() - dateA.getTime();
-      } else {
-        return dateA.getTime() - dateB.getTime();
-      }
-    });
-
-    this.filteredVisitors = filtered;
+    this.loadVisitors();
   }
 
   parseThaiDate(dateStr: string): Date | null {

@@ -1,0 +1,81 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Visitor {
+  id?: number;
+  idCard: string;
+  firstName: string;
+  lastName: string;
+  birthDate?: string;
+  phone: string;
+  licensePlate?: string;
+  houseNumber?: string;
+  moo?: string;
+  soi?: string;
+  road?: string;
+  subDistrict?: string;
+  district?: string;
+  province?: string;
+  rfid: string;
+  department?: string;
+  officerName?: string;
+  idCardImage?: string;
+}
+
+export interface VisitorListResponse {
+  id: number;
+  idCard: string;
+  name: string;
+  birthDate: string;
+  phone: string;
+  address: string;
+  rfid: string;
+  department: string;
+  officerName: string;
+  registeredAt: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class VisitorService {
+  private apiUrl = 'http://localhost:8080/api/visitors';
+
+  constructor(private http: HttpClient) {}
+
+  // สร้าง Visitor ใหม่
+  createVisitor(visitor: Visitor): Observable<Visitor> {
+    return this.http.post<Visitor>(this.apiUrl, visitor);
+  }
+
+  // ดึงรายการ Visitors
+  getVisitors(params?: {
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    sortOrder?: string;
+  }): Observable<VisitorListResponse[]> {
+    let httpParams = new HttpParams();
+    
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params?.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+    if (params?.endDate) {
+      httpParams = httpParams.set('endDate', params.endDate);
+    }
+    if (params?.sortOrder) {
+      httpParams = httpParams.set('sortOrder', params.sortOrder);
+    }
+
+    return this.http.get<VisitorListResponse[]>(this.apiUrl, { params: httpParams });
+  }
+
+  // ดึง Visitor ตาม ID
+  getVisitorById(id: number): Observable<Visitor> {
+    return this.http.get<Visitor>(`${this.apiUrl}/${id}`);
+  }
+}
