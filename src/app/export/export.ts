@@ -18,6 +18,9 @@ interface ExportRecord {
   styleUrls: ['./export.css']
 })
 export class ExportComponent implements OnInit {
+  // Declare SweetAlert2
+  private Swal: any;
+
   // Form data
   selectedDepartment: string = 'ทั้งหมด';
   startDate: string = '';
@@ -71,6 +74,25 @@ export class ExportComponent implements OnInit {
 
     // แสดงข้อมูลทั้งหมดตอนเริ่มต้น
     this.exportHistory = [...this.originalExportHistory];
+
+    // Load SweetAlert2
+    this.loadSweetAlert();
+  }
+
+  /**
+   * Load SweetAlert2 library
+   */
+  loadSweetAlert(): void {
+    if (typeof (window as any).Swal !== 'undefined') {
+      this.Swal = (window as any).Swal;
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+      script.onload = () => {
+        this.Swal = (window as any).Swal;
+      };
+      document.head.appendChild(script);
+    }
   }
 
   /**
@@ -85,13 +107,13 @@ export class ExportComponent implements OnInit {
    */
   exportData(): void {
     if (!this.startDate || !this.endDate) {
-      alert('กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด');
+      this.showErrorAlert('กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด');
       return;
     }
 
     // ตรวจสอบว่าวันที่เริ่มต้นไม่มากกว่าวันที่สิ้นสุด
     if (new Date(this.startDate) > new Date(this.endDate)) {
-      alert('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
+      this.showErrorAlert('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
       return;
     }
 
@@ -99,31 +121,158 @@ export class ExportComponent implements OnInit {
     const formattedStartDate = this.formatDateThai(this.startDate);
     const formattedEndDate = this.formatDateThai(this.endDate);
 
-    const exportData = {
+    // แสดง Confirmation Dialog
+    this.showExportConfirmation({
       department: this.selectedDepartment,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
       format: this.selectedFormat
-    };
+    });
+  }
 
-    console.log('Exporting data:', exportData);
+  /**
+   * แสดง Confirmation Dialog สำหรับการส่งออกข้อมูล
+   */
+  showExportConfirmation(data: any): void {
+    if (!this.Swal) {
+      alert('กำลังโหลด SweetAlert2...');
+      return;
+    }
 
-    // Add new export record to history
-    const newRecord: ExportRecord = {
-      exportDate: this.getCurrentDateTime(),
-      department: this.selectedDepartment,
-      dateRange: `${formattedStartDate} - ${formattedEndDate}`,
-      format: this.selectedFormat,
-      status: 'เสร็จสิ้น'
-    };
+    const htmlContent = `
+      <div style="text-align: left; padding: 10px;">
+        <div style="margin-bottom: 18px;">
+          <strong style="color: #2E50BC;">รายละเอียดการส่งออกข้อมูล</strong>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>ส่วนงาน:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #666;">${data.department}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>วันที่เริ่มต้น:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #666;">${data.startDate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>วันที่สิ้นสุด:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #666;">${data.endDate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;"><strong>รูปแบบไฟล์:</strong></td>
+            <td style="padding: 8px; color: #666; font-weight: 600;">${data.format}</td>
+          </tr>
+        </table>
+      </div>
+    `;
 
-    this.originalExportHistory.unshift(newRecord);
-    
-    // อัพเดทข้อมูลที่แสดงด้วย
-    this.applyFilters();
+    this.Swal.fire({
+      title: 'ยืนยันการส่งออกข้อมูล',
+      html: htmlContent,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#4CAF50',
+      cancelButtonColor: '#d33',
+      width: '550px'
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        // เริ่มกระบวนการส่งออก
+        this.performExport(data);
+      }
+    });
+  }
 
-    // TODO: Implement actual export logic
-    alert(`กำลังส่งออกข้อมูลในรูปแบบ ${this.selectedFormat}`);
+  /**
+   * ทำการส่งออกข้อมูลจริง
+   */
+  performExport(data: any): void {
+    // แสดง Loading
+    this.showLoadingAlert();
+
+    // จำลองการส่งออก (ใช้ setTimeout แทน API call จริง)
+    setTimeout(() => {
+      // Add new export record to history
+      const newRecord: ExportRecord = {
+        exportDate: this.getCurrentDateTime(),
+        department: data.department,
+        dateRange: `${data.startDate} - ${data.endDate}`,
+        format: data.format,
+        status: 'เสร็จสิ้น'
+      };
+
+      this.originalExportHistory.unshift(newRecord);
+      
+      // อัพเดทข้อมูลที่แสดงด้วย
+      this.applyFilters();
+
+      // ปิด Loading และแสดง Success
+      this.Swal.close();
+      this.showExportSuccessAlert(data.format);
+
+      // TODO: Implement actual export logic here
+      console.log('Exporting data:', data);
+    }, 2000); // จำลองเวลา 2 วินาที
+  }
+
+  /**
+   * แสดง Loading Alert ขณะส่งออกข้อมูล
+   */
+  showLoadingAlert(): void {
+    if (!this.Swal) return;
+
+    this.Swal.fire({
+      title: 'กำลังส่งออกข้อมูล...',
+      html: `
+        <div style="text-align: center; padding: 20px;">
+          <div class="spinner" style="margin: 0 auto 15px;"></div>
+          <p style="color: #666;">โปรดรอสักครู่ ระบบกำลังประมวลผลข้อมูล</p>
+        </div>
+      `,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        const style = document.createElement('style');
+        style.textContent = `
+          .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2E50BC;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    });
+  }
+
+  /**
+   * แสดง Success Alert หลังส่งออกสำเร็จ
+   */
+  showExportSuccessAlert(format: string): void {
+    if (!this.Swal) return;
+
+    this.Swal.fire({
+      icon: 'success',
+      title: 'ส่งออกข้อมูลสำเร็จ!',
+      html: `
+        <div style="text-align: center; padding: 10px;">
+          <p style="font-size: 16px; color: #666;">ไฟล์ ${format} ถูกส่งออกเรียบร้อยแล้ว</p>
+        </div>
+      `,
+      confirmButtonText: 'ตกลง',
+      confirmButtonColor: '#4CAF50',
+      timer: 3000,
+      timerProgressBar: true
+    });
   }
 
   /**
@@ -230,5 +379,52 @@ export class ExportComponent implements OnInit {
    */
   filterHistory(): void {
     this.applyFilters();
+  }
+
+  /**
+   * SweetAlert2 Helper Functions
+   */
+  showErrorAlert(message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: message,
+        confirmButtonText: 'ตรวจสอบอีกครั้ง',
+        confirmButtonColor: '#FBB903'
+      });
+    } else {
+      alert(message);
+    }
+  }
+
+  showSuccessAlert(title: string, message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'success',
+        title: title,
+        text: message,
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#FBB903',
+        timer: 2000,
+        timerProgressBar: true
+      });
+    } else {
+      alert(title + ': ' + message);
+    }
+  }
+
+  showWarningAlert(message: string): void {
+    if (this.Swal) {
+      this.Swal.fire({
+        icon: 'warning',
+        title: 'คำเตือน',
+        text: message,
+        confirmButtonText: 'รับทราบ',
+        confirmButtonColor: '#FBB903'
+      });
+    } else {
+      alert(message);
+    }
   }
 }

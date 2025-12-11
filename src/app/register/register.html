@@ -83,12 +83,8 @@
 
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label class="block text-sm font-medium mb-1">วันเกิด <span class="text-red-500">*</span></label>
-          <input type="date" formControlName="birthDate" class="w-full border rounded px-3 py-2 text-sm"
-            [ngClass]="{'border-red-500': registrationForm.get('birthDate')?.invalid && registrationForm.get('birthDate')?.touched, 'border-gray-300': !registrationForm.get('birthDate')?.invalid || !registrationForm.get('birthDate')?.touched}" />
-          <p class="text-red-500 text-xs mt-1"
-            *ngIf="registrationForm.get('birthDate')?.errors?.['required'] && registrationForm.get('birthDate')?.touched">
-            กรุณากรอกวันเกิด</p>
+          <label class="block text-sm font-medium mb-1">วันเกิด</label>
+          <input type="date" formControlName="birthDate" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
@@ -106,12 +102,8 @@
       <div class="border border-gray-300 rounded-b-lg p-4 mb-4">
         <div class="grid grid-cols-4 gap-4 mb-4">
           <div>
-            <label class="block text-sm font-medium mb-1">บ้านเลขที่ <span class="text-red-500">*</span></label>
-            <input type="text" formControlName="houseNumber" class="w-full border rounded px-3 py-2 text-sm"
-              [ngClass]="{'border-red-500': registrationForm.get('houseNumber')?.invalid && registrationForm.get('houseNumber')?.touched, 'border-gray-300': !registrationForm.get('houseNumber')?.invalid || !registrationForm.get('houseNumber')?.touched}" />
-            <p class="text-red-500 text-xs mt-1"
-              *ngIf="registrationForm.get('houseNumber')?.errors?.['required'] && registrationForm.get('houseNumber')?.touched">
-              กรุณากรอกบ้านเลขที่</p>
+            <label class="block text-sm font-medium mb-1">บ้านเลขที่</label>
+            <input type="text" formControlName="houseNumber" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" />
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">หมู่</label>
@@ -128,32 +120,20 @@
         </div>
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium mb-1">ตำบล <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium mb-1">ตำบล</label>
             <input id="subDistrict" type="text" formControlName="subDistrict"
-              class="w-full border rounded px-3 py-2 text-sm"
-              [ngClass]="{'border-red-500': registrationForm.get('subDistrict')?.invalid && registrationForm.get('subDistrict')?.touched, 'border-gray-300': !registrationForm.get('subDistrict')?.invalid || !registrationForm.get('subDistrict')?.touched}"
+              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               placeholder="พิมพ์เพื่อค้นหา..." />
-            <p class="text-red-500 text-xs mt-1"
-              *ngIf="registrationForm.get('subDistrict')?.errors?.['required'] && registrationForm.get('subDistrict')?.touched">
-              กรุณากรอกตำบล</p>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">อำเภอ <span class="text-red-500">*</span></label>
-            <input id="district" type="text" formControlName="district" class="w-full border rounded px-3 py-2 text-sm"
-              [ngClass]="{'border-red-500': registrationForm.get('district')?.invalid && registrationForm.get('district')?.touched, 'border-gray-300': !registrationForm.get('district')?.invalid || !registrationForm.get('district')?.touched}"
+            <label class="block text-sm font-medium mb-1">อำเภอ</label>
+            <input id="district" type="text" formControlName="district" class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               placeholder="พิมพ์เพื่อค้นหา..." />
-            <p class="text-red-500 text-xs mt-1"
-              *ngIf="registrationForm.get('district')?.errors?.['required'] && registrationForm.get('district')?.touched">
-              กรุณากรอกอำเภอ</p>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">จังหวัด <span class="text-red-500">*</span></label>
-            <input id="province" type="text" formControlName="province" class="w-full border rounded px-3 py-2 text-sm"
-              [ngClass]="{'border-red-500': registrationForm.get('province')?.invalid && registrationForm.get('province')?.touched, 'border-gray-300': !registrationForm.get('province')?.invalid || !registrationForm.get('province')?.touched}"
+            <label class="block text-sm font-medium mb-1">จังหวัด</label>
+            <input id="province" type="text" formControlName="province" class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               placeholder="พิมพ์เพื่อค้นหา..." />
-            <p class="text-red-500 text-xs mt-1"
-              *ngIf="registrationForm.get('province')?.errors?.['required'] && registrationForm.get('province')?.touched">
-              กรุณาเลือกจังหวัด</p>
           </div>
         </div>
       </div>
