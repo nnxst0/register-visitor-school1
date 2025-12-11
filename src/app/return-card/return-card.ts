@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 interface RfidCard {
   id: string;
@@ -27,8 +28,9 @@ interface HistoryLog {
   styleUrls: ['./return-card.css']
 })
 export class ReturnCardComponent {
+  
   searchInput: string = '';
-  activeCard: RfidCard | null = null;
+  activeCard: any;
 
   // Mock Data: ฐานข้อมูลจำลอง
   mockDatabase: RfidCard[] = [
@@ -69,14 +71,38 @@ export class ReturnCardComponent {
     };
 
     this.historyList.unshift(newLog); // เพิ่มรายการใหม่ไว้บนสุด
-    
-    // เรียงลำดับเลขที่ใหม่ (ถ้าต้องการให้เลข 1 อยู่บนสุดเสมอ)
-    // this.historyList.forEach((item, index) => item.no = this.historyList.length - index);
-
-    alert(`คืนบัตร ${this.activeCard.id} เรียบร้อยแล้ว`);
-    this.activeCard = null;
-    this.searchInput = '';
   
+  }
+  confirmReturnCard() {
+    Swal.fire({
+      title: 'ยืนยันการคืนบัตร?',
+      html: `
+        <div style="text-align: left; margin-top: 15px;">
+          <p><strong>รหัสบัตร:</strong> ${this.activeCard?.id}</p>
+          <p><strong>ชื่อ-นามสกุล:</strong> ${this.activeCard?.name}</p>
+          <p><strong>เวลาเข้า:</strong> ${this.activeCard?.checkIn}</p>
+          <p><strong>เวลาออก:</strong> ${this.activeCard?.checkOut}</p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#4CAF50',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ยืนยันคืนบัตร',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.onReturnCard();
+        Swal.fire({
+          title: 'คืนบัตรสำเร็จ!',
+          text: `บัตร ${this.activeCard?.id} ได้ถูกคืนเรียบร้อยแล้ว`,
+          icon: 'success',
+          confirmButtonColor: '#4CAF50',
+          confirmButtonText: 'ตกลง',
+          timer: 2000
+        });
+      }
+    });
   }
 
 
