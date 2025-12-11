@@ -577,10 +577,6 @@ th, td {
   color: #9ca3af;
 }
 
-.date-input:not(:focus):not([value]) {
-  color: transparent;
-}
-
 .date-input[value]:before {
   content: none;
 }
