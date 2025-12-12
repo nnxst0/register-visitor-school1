@@ -46,10 +46,6 @@ func (h *VisitorHandler) CreateVisitor(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Phone is required")
 		return
 	}
-	if req.RFID == "" {
-		respondWithError(w, http.StatusBadRequest, "RFID is required")
-		return
-	}
 
 	// Check if ID card already exists
 	exists, err := h.repo.CheckIDCardExists(req.IDCard)
@@ -62,15 +58,17 @@ func (h *VisitorHandler) CreateVisitor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if RFID already exists
-	rfidExists, err := h.repo.CheckRFIDExists(req.RFID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Failed to check RFID")
-		return
-	}
-	if rfidExists {
-		respondWithError(w, http.StatusConflict, "RFID already registered")
-		return
+	// Check if RFID already exists (only if RFID is provided)
+	if req.RFID != "" {
+		rfidExists, err := h.repo.CheckRFIDExists(req.RFID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Failed to check RFID")
+			return
+		}
+		if rfidExists {
+			respondWithError(w, http.StatusConflict, "RFID already registered")
+			return
+		}
 	}
 
 	// Parse birth date
