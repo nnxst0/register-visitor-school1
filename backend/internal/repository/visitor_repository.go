@@ -90,6 +90,7 @@ func (r *VisitorRepository) GetByID(id int) (*models.Visitor, error) {
 		&visitor.OfficerName,
 		&visitor.IDCardImage,
 		&visitor.RegisteredAt,
+		&visitor.ExitTime,
 		&visitor.UpdatedAt,
 	)
 
@@ -119,6 +120,12 @@ func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, e
 		query += ` AND (first_name LIKE ? OR last_name LIKE ? OR id_card LIKE ?)`
 		searchTerm := "%" + params.Search + "%"
 		args = append(args, searchTerm, searchTerm, searchTerm)
+	}
+
+	// ⭐ เพิ่ม Department filter
+	if params.Department != "" && params.Department != "ทั้งหมด" {
+		query += ` AND department = ?`
+		args = append(args, params.Department)
 	}
 
 	// Date range filter
@@ -179,6 +186,7 @@ func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, e
 			&v.OfficerName,
 			&v.IDCardImage,
 			&v.RegisteredAt,
+			&v.ExitTime,
 			&v.UpdatedAt,
 		)
 		if err != nil {
@@ -212,7 +220,6 @@ func (r *VisitorRepository) CheckRFIDExists(rfid string) (bool, error) {
 	return count > 0, nil
 }
 
-// FormatAddress formats the address from visitor data
 func FormatAddress(v *models.Visitor) string {
 	parts := []string{}
 
@@ -242,11 +249,8 @@ func FormatAddress(v *models.Visitor) string {
 		return "-"
 	}
 
-	address := strings.Join(parts, " ")
-	if len(parts) > 3 {
-		return strings.Join(parts[:3], " ") + "..."
-	}
-	return address
+	// ⭐ ลบการตัดออก - แสดงที่อยู่เต็ม
+	return strings.Join(parts, " ")
 }
 
 // FormatThaiDate formats date to Thai format

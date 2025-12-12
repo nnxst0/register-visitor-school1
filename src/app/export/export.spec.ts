@@ -1,22 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ExportComponent } from './export';
 import { FormsModule } from '@angular/forms';
 
 describe('ExportComponent', () => {
   let component: ExportComponent;
   let fixture: ComponentFixture<ExportComponent>;
+  let httpMock: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ExportComponent] // เปลี่ยนจาก declarations เป็น imports สำหรับ standalone component
-    })
-    .compileComponents();
+      imports: [
+        ExportComponent,
+        HttpClientTestingModule,
+        FormsModule
+      ]
+    }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify(); // ตรวจสอบว่าไม่มี HTTP request ที่ค้างอยู่
   });
 
   it('should create', () => {
@@ -25,9 +34,8 @@ describe('ExportComponent', () => {
 
   it('should have default form values', () => {
     expect(component.selectedDepartment).toBe('ทั้งหมด');
-    expect(component.startDate).toBeTruthy(); // เช็คว่ามีค่า
+    expect(component.startDate).toBeTruthy();
     expect(component.endDate).toBeTruthy();
-    expect(component.selectedFormat).toBe('CSV');
   });
 
   it('should initialize with today date', () => {
@@ -41,49 +49,56 @@ describe('ExportComponent', () => {
     expect(component.endDate).toBe(expectedDate);
   });
 
-  it('should select format correctly', () => {
-    component.selectFormat('Excel');
-    expect(component.selectedFormat).toBe('Excel');
+  it('should load export history on init', () => {
+    const mockHistory = [
+      {
+        id: 1,
+        exportDate: '2025-12-12 14:30:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/12/2568 - 12/12/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น',
+        recordCount: 25
+      }
+    ];
 
-    component.selectFormat('JSON');
-    expect(component.selectedFormat).toBe('JSON');
-  });
+    component.ngOnInit();
 
-  it('should have initial export history records', () => {
-    expect(component.originalExportHistory.length).toBe(3);
-    expect(component.exportHistory.length).toBe(3);
+    const req = httpMock.expectOne('http://localhost:8080/api/export-history');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockHistory);
+
+    expect(component.exportHistory.length).toBe(1);
     expect(component.exportHistory[0].department).toBe('ทั้งหมด');
-    expect(component.exportHistory[0].status).toBe('เสร็จสิ้น');
   });
 
-  it('should add new record when exporting data', () => {
-    spyOn(window, 'alert');
-    const initialLength = component.exportHistory.length;
-    
-    component.exportData();
-    
-    expect(component.exportHistory.length).toBeGreaterThanOrEqual(initialLength);
-    expect(component.exportHistory[0].status).toBe('เสร็จสิ้น');
+  it('should handle empty export history', () => {
+    component.ngOnInit();
+
+    const req = httpMock.expectOne('http://localhost:8080/api/export-history');
+    req.flush([]);
+
+    expect(component.exportHistory.length).toBe(0);
   });
 
-  it('should alert when dates are not selected', () => {
-    spyOn(window, 'alert');
+  it('should show error when dates are not selected', () => {
+    spyOn(component, 'showErrorAlert');
     component.startDate = '';
     component.endDate = '';
-    
+
     component.exportData();
-    
-    expect(window.alert).toHaveBeenCalledWith('กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด');
+
+    expect(component.showErrorAlert).toHaveBeenCalledWith('กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด');
   });
 
-  it('should alert when start date is after end date', () => {
-    spyOn(window, 'alert');
+  it('should show error when start date is after end date', () => {
+    spyOn(component, 'showErrorAlert');
     component.startDate = '2025-12-31';
     component.endDate = '2025-01-01';
-    
+
     component.exportData();
-    
-    expect(window.alert).toHaveBeenCalledWith('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
+
+    expect(component.showErrorAlert).toHaveBeenCalledWith('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
   });
 
   it('should format Thai date correctly', () => {
@@ -96,40 +111,106 @@ describe('ExportComponent', () => {
     expect(result).toBe('');
   });
 
+  it('should format date for file name correctly', () => {
+    const result = component.formatDateForFile('2025-12-15');
+    expect(result).toBe('20251215');
+  });
+
+  it('should format ID card correctly', () => {
+    const result = component.formatIDCard('1234567890123');
+    expect(result).toBe('1-2345-67890-12-3');
+  });
+
+  it('should return original ID card if invalid length', () => {
+    const result = component.formatIDCard('12345');
+    expect(result).toBe('12345');
+  });
+
   it('should generate current date time correctly', () => {
     const dateTime = component.getCurrentDateTime();
     expect(dateTime).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
   });
 
   it('should sort history in descending order', () => {
+    component.exportHistory = [
+      {
+        exportDate: '2025-12-10 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/12/2568 - 10/12/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-12-12 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/12/2568 - 12/12/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.sortOrder = 'desc';
     component.sortHistory();
-    
-    for (let i = 0; i < component.exportHistory.length - 1; i++) {
-      const currentDate = new Date(component.exportHistory[i].exportDate);
-      const nextDate = new Date(component.exportHistory[i + 1].exportDate);
-      expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
-    }
+
+    expect(new Date(component.exportHistory[0].exportDate).getTime())
+      .toBeGreaterThanOrEqual(new Date(component.exportHistory[1].exportDate).getTime());
   });
 
   it('should sort history in ascending order', () => {
+    component.exportHistory = [
+      {
+        exportDate: '2025-12-12 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/12/2568 - 12/12/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-12-10 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/12/2568 - 10/12/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.sortOrder = 'asc';
     component.sortHistory();
-    
-    for (let i = 0; i < component.exportHistory.length - 1; i++) {
-      const currentDate = new Date(component.exportHistory[i].exportDate);
-      const nextDate = new Date(component.exportHistory[i + 1].exportDate);
-      expect(currentDate.getTime()).toBeLessThanOrEqual(nextDate.getTime());
-    }
+
+    expect(new Date(component.exportHistory[0].exportDate).getTime())
+      .toBeLessThanOrEqual(new Date(component.exportHistory[1].exportDate).getTime());
   });
 
   it('should filter history by date range', () => {
+    component.originalExportHistory = [
+      {
+        exportDate: '2025-09-25 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 25/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-09-28 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 28/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-10-01 09:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/10/2568 - 01/10/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.filterStartDate = '2025-09-25';
     component.filterEndDate = '2025-09-28';
-    
     component.filterHistory();
-    
-    // ตรวจสอบว่าข้อมูลที่แสดงอยู่ในช่วงวันที่
+
+    expect(component.exportHistory.length).toBe(2);
     component.exportHistory.forEach(record => {
       const recordDate = new Date(record.exportDate);
       const startDate = new Date(component.filterStartDate);
@@ -140,11 +221,27 @@ describe('ExportComponent', () => {
   });
 
   it('should filter by start date only', () => {
+    component.originalExportHistory = [
+      {
+        exportDate: '2025-09-25 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 25/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-09-28 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 28/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.filterStartDate = '2025-09-28';
     component.filterEndDate = '';
-    
     component.filterHistory();
-    
+
     component.exportHistory.forEach(record => {
       const recordDate = new Date(record.exportDate);
       const startDate = new Date(component.filterStartDate);
@@ -154,11 +251,27 @@ describe('ExportComponent', () => {
   });
 
   it('should filter by end date only', () => {
+    component.originalExportHistory = [
+      {
+        exportDate: '2025-09-25 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 25/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-09-30 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 30/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.filterStartDate = '';
     component.filterEndDate = '2025-09-28';
-    
     component.filterHistory();
-    
+
     component.exportHistory.forEach(record => {
       const recordDate = new Date(record.exportDate);
       const endDate = new Date(component.filterEndDate);
@@ -168,16 +281,29 @@ describe('ExportComponent', () => {
   });
 
   it('should clear filters and show all records', () => {
-    // กรองข้อมูลก่อน
+    component.originalExportHistory = [
+      {
+        exportDate: '2025-09-25 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 25/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      },
+      {
+        exportDate: '2025-09-28 14:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 28/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     component.filterStartDate = '2025-09-28';
     component.filterEndDate = '2025-09-28';
     component.filterHistory();
-    
-    const filteredLength = component.exportHistory.length;
-    
-    // ล้างตัวกรอง
+
     component.clearFilters();
-    
+
     expect(component.filterStartDate).toBe('');
     expect(component.filterEndDate).toBe('');
     expect(component.exportHistory.length).toBe(component.originalExportHistory.length);
@@ -195,29 +321,6 @@ describe('ExportComponent', () => {
     expect(component.endDate).toBe('2025-01-31');
   });
 
-  it('should create export record with correct data', () => {
-    spyOn(window, 'alert');
-    
-    component.selectedDepartment = 'กลุ่มบริหารวิชาการ';
-    component.startDate = '2025-09-10';
-    component.endDate = '2025-09-15';
-    component.selectedFormat = 'Excel';
-    
-    component.exportData();
-    
-    const latestRecord = component.exportHistory[0];
-    expect(latestRecord.department).toBe('กลุ่มบริหารวิชาการ');
-    expect(latestRecord.format).toBe('Excel');
-  });
-
-  it('should display correct status', () => {
-    const successRecord = component.exportHistory.find(r => r.status === 'เสร็จสิ้น');
-    const errorRecord = component.originalExportHistory.find(r => r.status === 'ล้มเหลว');
-    
-    expect(successRecord).toBeDefined();
-    expect(errorRecord).toBeDefined();
-  });
-
   it('should apply filters when filterHistory is called', () => {
     spyOn(component, 'applyFilters');
     
@@ -227,12 +330,77 @@ describe('ExportComponent', () => {
   });
 
   it('should maintain original data after filtering', () => {
+    component.originalExportHistory = [
+      {
+        exportDate: '2025-09-25 10:00:00',
+        department: 'ทั้งหมด',
+        dateRange: '01/09/2568 - 25/09/2568',
+        format: 'Excel',
+        status: 'เสร็จสิ้น'
+      }
+    ];
+
     const originalLength = component.originalExportHistory.length;
     
     component.filterStartDate = '2025-09-28';
     component.filterHistory();
     
-    // ข้อมูลต้นฉบับต้องไม่เปลี่ยนแปลง
     expect(component.originalExportHistory.length).toBe(originalLength);
+  });
+
+  it('should handle API error when loading history', () => {
+    spyOn(console, 'error');
+    
+    component.ngOnInit();
+
+    const req = httpMock.expectOne('http://localhost:8080/api/export-history');
+    req.error(new ErrorEvent('Network error'));
+
+    expect(component.exportHistory.length).toBe(0);
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  it('should show warning when no data found', () => {
+    spyOn(component, 'showWarningAlert');
+    component.selectedDepartment = 'ทั้งหมด';
+    component.startDate = '2025-12-01';
+    component.endDate = '2025-12-10';
+
+    component.exportData();
+    
+    // Mock confirmation
+    if (component.Swal) {
+      component.performExport({
+        department: 'ทั้งหมด',
+        startDate: '01/12/2568',
+        endDate: '10/12/2568',
+        format: 'Excel'
+      });
+    }
+
+    const req = httpMock.expectOne((request) => 
+      request.url === 'http://localhost:8080/api/visitors'
+    );
+    req.flush([]); // ส่งข้อมูลว่างกลับ
+
+    expect(component.showWarningAlert).toHaveBeenCalledWith('ไม่พบข้อมูลในช่วงวันที่ที่เลือก');
+  });
+
+  it('should load SweetAlert2 if not available', () => {
+    (window as any).Swal = undefined;
+    
+    component.loadSweetAlert();
+
+    const scripts = document.getElementsByTagName('script');
+    let foundSweetAlert = false;
+    
+    for (let i = 0; i < scripts.length; i++) {
+      if (scripts[i].src.includes('sweetalert2')) {
+        foundSweetAlert = true;
+        break;
+      }
+    }
+
+    expect(foundSweetAlert).toBeTruthy();
   });
 });

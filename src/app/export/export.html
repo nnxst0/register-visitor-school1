@@ -53,18 +53,11 @@
         <div class="form-footer">
             <div class="format-buttons">
                 <label>รูปแบบไฟล์</label>
-                <button [class.active]="selectedFormat === 'CSV'" (click)="selectFormat('CSV')" class="format-btn">
-                    CSV
-                </button>
-                <button [class.active]="selectedFormat === 'Excel'" (click)="selectFormat('Excel')" class="format-btn">
-                    Excel
-                </button>
-                <button [class.active]="selectedFormat === 'JSON'" (click)="selectFormat('JSON')" class="format-btn">
-                    JSON
-                </button>
+                <span class="format-text">Excel</span>
             </div>
 
             <button class="export-btn" (click)="exportData()">
+                <i class="fas fa-download"></i>
                 ส่งออกข้อมูล
             </button>
         </div>
@@ -114,6 +107,7 @@
                         <th>ประเภทส่วนงาน</th>
                         <th>ช่วงวันที่</th>
                         <th>รูปแบบไฟล์</th>
+                        <th>จำนวนข้อมูล</th>
                         <th>สถานะ</th>
                     </tr>
                 </thead>
@@ -122,11 +116,24 @@
                         <td>{{ record.exportDate }}</td>
                         <td>{{ record.department }}</td>
                         <td>{{ record.dateRange }}</td>
-                        <td>{{ record.format }}</td>
+                        <td>
+                            <span class="format-badge">
+                                <i class="fas fa-file-excel"></i>
+                                {{ record.format }}
+                            </span>
+                        </td>
+                        <td>{{ record.recordCount || '-' }} รายการ</td>
                         <td>
                             <span [class]="record.status === 'เสร็จสิ้น' ? 'status-success' : 'status-error'">
+                                <i [class]="record.status === 'เสร็จสิ้น' ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
                                 {{ record.status }}
                             </span>
+                        </td>
+                    </tr>
+                    <tr *ngIf="exportHistory.length === 0">
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                            ไม่มีประวัติการส่งออกข้อมูล
                         </td>
                     </tr>
                 </tbody>

@@ -133,10 +133,11 @@ func (h *VisitorHandler) GetVisitor(w http.ResponseWriter, r *http.Request) {
 func (h *VisitorHandler) ListVisitors(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters
 	params := models.QueryParams{
-		Search:    r.URL.Query().Get("search"),
-		StartDate: r.URL.Query().Get("startDate"),
-		EndDate:   r.URL.Query().Get("endDate"),
-		SortOrder: r.URL.Query().Get("sortOrder"),
+		Search:     r.URL.Query().Get("search"),
+		StartDate:  r.URL.Query().Get("startDate"),
+		EndDate:    r.URL.Query().Get("endDate"),
+		SortOrder:  r.URL.Query().Get("sortOrder"),
+		Department: r.URL.Query().Get("department"),
 	}
 
 	// Parse pagination
@@ -178,17 +179,29 @@ func (h *VisitorHandler) ListVisitors(w http.ResponseWriter, r *http.Request) {
 			phone = phone[:3] + "-" + phone[3:]
 		}
 
+		licensePlate := "-"
+		if v.LicensePlate != "" {
+			licensePlate = v.LicensePlate
+		}
+
+		exitTime := "-"
+		if v.ExitTime != nil {
+			exitTime = v.ExitTime.Format("02/01/2006 15:04:05")
+		}
+
 		response[i] = models.VisitorListResponse{
 			ID:           v.ID,
 			IDCard:       v.IDCard,
 			Name:         v.FirstName + " " + v.LastName,
 			BirthDate:    birthDate,
 			Phone:        phone,
-			Address:      repository.FormatAddress(&v),
+			LicensePlate: licensePlate,                 // ⭐ เพิ่มบรรทัดนี้
+			Address:      repository.FormatAddress(&v), // ⭐ ใช้แบบเต็ม
 			RFID:         v.RFID,
 			Department:   v.Department,
 			OfficerName:  v.OfficerName,
 			RegisteredAt: v.RegisteredAt.Format("02/01/2006 15:04:05"),
+			ExitTime:     exitTime,
 		}
 	}
 
