@@ -1,38 +1,58 @@
 <div class="container">
   <div class="header">
-  <i class="fas fa-table"></i>
-  <h1>ตารางข้อมูลผู้มาติดต่อ</h1>
-</div>
+    <i class="fas fa-table"></i>
+    <h1>ตารางข้อมูลผู้มาติดต่อ</h1>
+  </div>
 
   <div class="content-box">
     
-      <div class="custom-date-container">
-          
-          <div class="date-pill" (click)="picker.open()">
-              <span class="date-text">
-                  {{ startDate ? (startDate | date:'dd/MM/yyyy') : 'วันที่เริ่มต้น' }}
-              </span>
-              <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
-          </div>
-
-          <div class="date-pill" (click)="picker.open()">
-              <span class="date-text">
-                  {{ endDate ? (endDate | date:'dd/MM/yyyy') : 'วันที่สิ้นสุด' }}
-              </span>
-              <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
-          </div>
-
+    <!-- Date Filter Section -->
+    <div class="custom-date-container">
+      <div class="date-pill" (click)="pickerStart.open()">
+        <span class="date-text">
+          {{ startDate ? (startDate | date:'dd/MM/yyyy') : 'วันที่เริ่มต้น' }}
+        </span>
+        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
       </div>
 
       <mat-form-field class="hidden-picker">
-          <mat-date-range-input [rangePicker]="picker">
-              <input matStartDate [(ngModel)]="startDate">
-              <input matEndDate [(ngModel)]="endDate">
-          </mat-date-range-input>
-          <mat-date-range-picker #picker></mat-date-range-picker>
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="onDateRangeChange()">
+        <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
 
-    <div class="table-responsive">
+      <div class="date-pill" (click)="pickerEnd.open()">
+        <span class="date-text">
+          {{ endDate ? (endDate | date:'dd/MM/yyyy') : 'วันที่สิ้นสุด' }}
+        </span>
+        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+      </div>
+
+      <mat-form-field class="hidden-picker">
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="onDateRangeChange()">
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <button class="btn-clear" (click)="clearDateFilter()" *ngIf="startDate || endDate">
+        <mat-icon>clear</mat-icon>
+        ล้างตัวกรอง
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading-container">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error()" class="error-container">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="loadVisitors()">ลองอีกครั้ง</button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive" *ngIf="!isLoading() && !error()">
       <table>
         <thead>
           <tr>
@@ -47,6 +67,15 @@
           </tr>
         </thead>
         <tbody>
+          @if (visitors().length === 0) {
+            <tr>
+              <td colspan="8" class="text-center no-data">
+                <i class="fas fa-inbox"></i>
+                <p>ไม่พบข้อมูลผู้มาติดต่อ</p>
+                <small *ngIf="startDate || endDate">ลองเปลี่ยนช่วงวันที่ หรือล้างตัวกรอง</small>
+              </td>
+            </tr>
+          }
           @for (item of visitors(); track item.id) {
             <tr>
               <td class="text-center font-bold text-blue">{{ item.id }}</td>
@@ -56,7 +85,11 @@
               <td class="text-center text-blue">{{ item.timeOut }}</td>
               <td class="text-left text-blue pl-4">{{ item.department }}</td>
               <td class="text-center">
-                <button class="link-btn" (click)="viewImage(item.id)">รูป</button>
+                <button class="link-btn" (click)="viewImage(item.id)" *ngIf="item.hasImage">
+                  <mat-icon class="btn-icon">image</mat-icon>
+                  รูป
+                </button>
+                <span class="no-image" *ngIf="!item.hasImage">-</span>
               </td>
               <td class="text-center text-blue">{{ item.status }}</td>
             </tr>
@@ -66,8 +99,44 @@
     </div>
 
     <div class="footer-action">
-      <button class="btn-add" routerLink="/register">เพิ่มผู้มาติดต่อ</button>
+      <button class="btn-add" routerLink="/register">
+        <mat-icon>add</mat-icon>
+        เพิ่มผู้มาติดต่อ
+      </button>
     </div>
 
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal-overlay" *ngIf="showImageModal()" (click)="closeImageModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeImageModal()">
+      <mat-icon>close</mat-icon>
+    </button>
+    
+    <div class="modal-header">
+      <h2>รูปบัตรประชาชน</h2>
+      <p>ผู้มาติดต่อลำดับที่ {{ selectedVisitorId() }}</p>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="isLoadingImage()" class="image-loading">
+        <div class="spinner"></div>
+        <p>กำลังโหลดรูปภาพ...</p>
+      </div>
+
+      <div *ngIf="!isLoadingImage() && imageError()" class="image-error">
+        <mat-icon class="error-icon">broken_image</mat-icon>
+        <p>{{ imageError() }}</p>
+      </div>
+
+      <img 
+        *ngIf="!isLoadingImage() && !imageError() && visitorImage()" 
+        [src]="visitorImage()" 
+        alt="ID Card Image"
+        class="id-card-image"
+      />
+    </div>
   </div>
 </div>
