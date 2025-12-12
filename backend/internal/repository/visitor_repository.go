@@ -65,7 +65,7 @@ func (r *VisitorRepository) GetByID(id int) (*models.Visitor, error) {
 	query := `
 		SELECT id, id_card, first_name, last_name, birth_date, phone, license_plate,
 			house_number, moo, soi, road, sub_district, district, province,
-			rfid, department, officer_name, id_card_image, registered_at, updated_at
+			rfid, department, officer_name, id_card_image, registered_at, exit_time, updated_at
 		FROM visitors WHERE id = ?
 	`
 
@@ -107,11 +107,12 @@ func (r *VisitorRepository) GetByID(id int) (*models.Visitor, error) {
 // List retrieves visitors with filters
 func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, error) {
 	query := `
-		SELECT id, id_card, first_name, last_name, birth_date, phone, license_plate,
-			house_number, moo, soi, road, sub_district, district, province,
-			rfid, department, officer_name, id_card_image, registered_at, updated_at
-		FROM visitors WHERE 1=1
-	`
+    SELECT id, id_card, first_name, last_name, birth_date, phone, license_plate,
+        house_number, moo, soi, road, sub_district, district, province,
+        rfid, department, officer_name, id_card_image,
+        registered_at, exit_time, updated_at
+    FROM visitors WHERE 1=1
+`
 
 	args := []interface{}{}
 
