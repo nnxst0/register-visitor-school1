@@ -118,7 +118,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       subDistrict: [''],
       district: [''],
       province: [''],
-      rfid: ['', Validators.required]
+      rfid: ['']  // ไม่ required แล้ว
     });
 
     this.officerForm = this.fb.group({
@@ -541,12 +541,12 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('เกิดข้อผิดพลาด:', error);
-        
+
         let errorMessage = 'ไม่สามารถบันทึกข้อมูลได้';
         if (error.error?.error) {
           errorMessage = error.error.error;
         }
-        
+
         this.showErrorAlert(errorMessage);
       }
     });
@@ -592,7 +592,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
           department: v.department,
           officer: v.officerName
         }));
-        
+
         // อัพเดท visitors array ด้วย
         this.visitors = this.filteredVisitors;
       },
