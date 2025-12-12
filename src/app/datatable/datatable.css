@@ -146,11 +146,12 @@ td:last-child {
 /* Link Button (คำว่า "รูป") */
 .link-btn {
   background: none;
+  font-family: 'mitr', sans-serif;
   border: none;
   color: #3556c4;
   font-weight: bold;
   cursor: pointer;
-  text-decoration: underline;
+  
 }
 
 /* Footer Button (ปุ่มเพิ่มผู้มาติดต่อ) */
@@ -293,6 +294,7 @@ input[matStartDate], input[matEndDate] {
   color: #dc2626;
   border: none;
   border-radius: 8px;
+  font-family: 'mitr', sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

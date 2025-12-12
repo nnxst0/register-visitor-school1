@@ -256,3 +256,21 @@ func FormatThaiDate(t *time.Time) string {
 	}
 	return t.Format("02/01/2006")
 }
+
+// วางท้ายไฟล์ หลัง FormatThaiDate()
+func (r *VisitorRepository) CheckDuplicateReturn(cardId string) (bool, error) {
+	query := `
+		SELECT COUNT(*) 
+		FROM return_card_logs 
+		WHERE card_id = ? 
+		AND DATE(return_date) = CURDATE()
+	`
+
+	var count int
+	err := r.db.QueryRow(query, cardId).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to check duplicate return: %w", err)
+	}
+
+	return count > 0, nil
+}

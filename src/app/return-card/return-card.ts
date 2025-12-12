@@ -1,24 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
-
-interface RfidCard {
-  id: string;
-  name: string;
-  checkIn: string;
-  checkOut: string;
-}
-
-interface HistoryLog {
-  no: number;
-  cardId: string;
-  name: string;
-  timeIn: string;
-  timeOut: string;
-  date: string;
-  status: string;
-}
+import { VisitorService, RFIDCardResponse, ReturnCardHistoryResponse } from '../services/visitor.service';
 
 @Component({
   selector: 'app-return-card',
@@ -27,61 +11,80 @@ interface HistoryLog {
   templateUrl: './return-card.html',
   styleUrls: ['./return-card.css']
 })
-export class ReturnCardComponent {
+export class ReturnCardComponent implements OnInit {
   
   searchInput: string = '';
-  activeCard: any;
+  activeCard: RFIDCardResponse | null = null;
+  historyList: ReturnCardHistoryResponse[] = [];
+  historyListOriginal: ReturnCardHistoryResponse[] = [];
 
-  // Mock Data: ฐานข้อมูลจำลอง
-  mockDatabase: RfidCard[] = [
-    { id: 'RF1001', name: 'สีฟ้า ใจดี', checkIn: '09:11', checkOut: '10:55' },
-    { id: 'RF1002', name: 'ธนัญญา วันเสน', checkIn: '08:30', checkOut: '09:41' },
-    { id: 'RF1003', name: 'สมชาย รักเรียน', checkIn: '07:50', checkOut: '16:00' }
-  ];
+  // Filter states
+  filterText: string = "";
+  startDate: string = "";
+  endDate: string = "";
+  showDatePicker = false;
+  showSort = false;
+  sortMode: 'asc' | 'desc' | '' = '';
 
-  // Mock Data: ประวัติเริ่มต้น
-  historyList: HistoryLog[] = [
-    { no: 1, cardId: 'RF1001', name: 'วิลาสินี ศิริชุม', timeIn: '09:11', timeOut: '10:55', date: '08/09/2025', status: 'การคืนบัตรสำเร็จ' },
-    { no: 2, cardId: 'RF1002', name: 'ธนัญญา วันเสน', timeIn: '08:30', timeOut: '09:41', date: '04/09/2025', status: 'การคืนบัตรสำเร็จ' }
-  ];
+  // Loading states
+  isSearching = false;
+  isReturning = false;
+  isLoadingHistory = false;
 
-  onSearch() {
-    if (!this.searchInput) return;
-    const found = this.mockDatabase.find(c => c.id.toLowerCase() === this.searchInput.toLowerCase());
-    
-    if (found) {
-      this.activeCard = found;
-    } else {
-      alert('ไม่พบข้อมูลบัตร RFID นี้ (ลองใส่ RF1001 หรือ RF1002)');
-      this.activeCard = null;
-    }
+  constructor(private visitorService: VisitorService) {}
+
+  ngOnInit() {
+    console.log('🔄 Component initialized, loading history...');
+    this.loadReturnHistory();
   }
 
-  onReturnCard() {
+  // ค้นหาบัตร RFID
+  onSearch() {
+    if (!this.searchInput.trim()) {
+      Swal.fire({
+        title: 'กรุณาสแกนบัตร',
+        text: 'กรุณาสแกนหรือพิมพ์รหัสบัตร RFID',
+        icon: 'warning',
+        confirmButtonColor: '#4CAF50'
+      });
+      return;
+    }
+
+    this.isSearching = true;
+    console.log('🔍 Searching for RFID:', this.searchInput.trim());
+
+    this.visitorService.searchByRFID(this.searchInput.trim()).subscribe({
+      next: (response) => {
+        console.log('✅ Found card:', response);
+        this.activeCard = response;
+        this.isSearching = false;
+      },
+      error: (error) => {
+        console.error('❌ Search error:', error);
+        this.isSearching = false;
+        Swal.fire({
+          title: 'ไม่พบข้อมูล',
+          text: 'ไม่พบข้อมูลบัตร RFID นี้ในระบบ',
+          icon: 'error',
+          confirmButtonColor: '#d33'
+        });
+        this.activeCard = null;
+      }
+    });
+  }
+
+  // ยืนยันการคืนบัตร
+  confirmReturnCard() {
     if (!this.activeCard) return;
 
-    const newLog: HistoryLog = {
-      no: this.historyList.length + 1,
-      cardId: this.activeCard.id,
-      name: this.activeCard.name,
-      timeIn: this.activeCard.checkIn,
-      timeOut: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-      date: new Date().toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-      status: 'การคืนบัตรสำเร็จ'
-    };
-
-    this.historyList.unshift(newLog); // เพิ่มรายการใหม่ไว้บนสุด
-  
-  }
-  confirmReturnCard() {
     Swal.fire({
       title: 'ยืนยันการคืนบัตร?',
       html: `
         <div style="text-align: left; margin-top: 15px;">
-          <p><strong>รหัสบัตร:</strong> ${this.activeCard?.id}</p>
-          <p><strong>ชื่อ-นามสกุล:</strong> ${this.activeCard?.name}</p>
-          <p><strong>เวลาเข้า:</strong> ${this.activeCard?.checkIn}</p>
-          <p><strong>เวลาออก:</strong> ${this.activeCard?.checkOut}</p>
+          <p><strong>รหัสบัตร:</strong> ${this.activeCard.id}</p>
+          <p><strong>ชื่อ-นามสกุล:</strong> ${this.activeCard.name}</p>
+          <p><strong>เวลาเข้า:</strong> ${this.activeCard.checkIn}</p>
+          <p><strong>เวลาออก:</strong> ${this.activeCard.checkOut}</p>
         </div>
       `,
       icon: 'question',
@@ -93,6 +96,27 @@ export class ReturnCardComponent {
     }).then((result) => {
       if (result.isConfirmed) {
         this.onReturnCard();
+      }
+    });
+  }
+
+  // คืนบัตร
+  onReturnCard() {
+    if (!this.activeCard) return;
+
+    this.isReturning = true;
+    const checkOut = new Date().toLocaleTimeString('th-TH', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+
+    console.log('📤 Returning card:', this.activeCard.id, 'at', checkOut);
+
+    this.visitorService.returnCard(this.activeCard.id, checkOut).subscribe({
+      next: (response) => {
+        console.log('✅ Card returned successfully:', response);
+        this.isReturning = false;
+        
         Swal.fire({
           title: 'คืนบัตรสำเร็จ!',
           text: `บัตร ${this.activeCard?.id} ได้ถูกคืนเรียบร้อยแล้ว`,
@@ -101,76 +125,141 @@ export class ReturnCardComponent {
           confirmButtonText: 'ตกลง',
           timer: 2000
         });
+
+        // รีเฟรชประวัติ
+        this.loadReturnHistory();
+        
+        // ล้างข้อมูลบัตรที่แสดง
+        this.activeCard = null;
+        this.searchInput = '';
+      },
+      error: (error) => {
+        console.error('❌ Return error:', error);
+        this.isReturning = false;
+        
+        // ตรวจสอบว่าเป็น error แบบไหน
+        const errorMessage = error.error?.error || error.message || 'ไม่สามารถคืนบัตรได้ กรุณาลองใหม่อีกครั้ง';
+        
+        // ถ้าเป็นบัตรซ้ำ แสดง warning สีส้ม
+        if (errorMessage.includes('ถูกคืนไปแล้ว') || errorMessage.includes('ซ้ำ')) {
+          Swal.fire({
+            title: '⚠️ บัตรซ้ำ!',
+            html: `
+              <div style="text-align: center; margin-top: 15px;">
+                <p style="font-size: 16px; margin-bottom: 10px;">
+                  <strong>บัตร ${this.activeCard?.id}</strong> ถูกคืนไปแล้ววันนี้
+                </p>
+                <p style="color: #666;">ไม่สามารถคืนบัตรซ้ำได้</p>
+              </div>
+            `,
+            icon: 'warning',
+            confirmButtonColor: '#ff9800',
+            confirmButtonText: 'เข้าใจแล้ว'
+          });
+        } else {
+          // Error อื่นๆ แสดงเป็น error สีแดง
+          Swal.fire({
+            title: 'เกิดข้อผิดพลาด',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonColor: '#d33'
+          });
+        }
+        
+        // ล้างข้อมูลบัตร
+        this.activeCard = null;
+        this.searchInput = '';
       }
     });
   }
 
+  // โหลดประวัติการคืนบัตร
+  loadReturnHistory() {
+    this.isLoadingHistory = true;
+    console.log('📋 Loading return history...');
+    
+    this.visitorService.getReturnHistory().subscribe({
+      next: (response) => {
+        console.log('✅ History loaded:', response);
+        console.log('📊 Total records:', response.length);
+        
+        this.historyList = response;
+        this.historyListOriginal = [...response];
+        this.isLoadingHistory = false;
 
-  filterText: string = "";
-startDate: string = "";
-endDate: string = "";
-showDatePicker = false;
-
-showSort = false;
-sortMode: 'asc' | 'desc' | '' = '';
-
-historyListOriginal = [...this.historyList]; // สำเนาข้อมูลจริง
-
-toggleDatePicker() {
-  this.showDatePicker = !this.showDatePicker;
-}
-
-toggleSort() {
-  this.showSort = !this.showSort;
-}
-
-setSort(mode: 'asc' | 'desc') {
-  this.sortMode = mode;
-  this.showSort = false;
-  this.applyFilters();
-}
-
-applyFilters() {
-  let data = [...this.historyListOriginal];
-
-  // 🔍 search filter
-  if (this.filterText.trim() !== "") {
-    data = data.filter(item =>
-      item.cardId.toLowerCase().includes(this.filterText.toLowerCase()) ||
-      item.name.toLowerCase().includes(this.filterText.toLowerCase())
-    );
+        if (response.length === 0) {
+          console.warn('⚠️ No return history found in database');
+        }
+      },
+      error: (error) => {
+        console.error('❌ History load error:', error);
+        console.error('Error details:', error.error);
+        this.isLoadingHistory = false;
+        
+        // แสดง error แต่ไม่รบกวนผู้ใช้
+        this.historyList = [];
+        this.historyListOriginal = [];
+      }
+    });
   }
 
-  // 📅 date filter
-// 📅 date filter (convert ก่อนเทียบ)
-if (this.startDate) {
-  data = data.filter(item => 
-    this.convertToISO(item.date) >= this.startDate
-  );
-}
-
-if (this.endDate) {
-  data = data.filter(item => 
-    this.convertToISO(item.date) <= this.endDate
-  );
-}
-
-
-  // 🔽 sort
-  if (this.sortMode === "asc") {
-    data = data.sort((a, b) => a.timeIn.localeCompare(b.timeIn));
-  }
-  if (this.sortMode === "desc") {
-    data = data.sort((a, b) => b.timeIn.localeCompare(a.timeIn));
+  // Toggle Date Picker
+  toggleDatePicker() {
+    this.showDatePicker = !this.showDatePicker;
   }
 
-  this.historyList = data;
-}
+  // Toggle Sort
+  toggleSort() {
+    this.showSort = !this.showSort;
+  }
 
-// แปลง dd/mm/yyyy → yyyy-mm-dd
-convertToISO(dateStr: string): string {
-  const [day, month, year] = dateStr.split("/");
-  return `${year}-${month}-${day}`;
-}
+  // Set Sort Mode
+  setSort(mode: 'asc' | 'desc') {
+    this.sortMode = mode;
+    this.showSort = false;
+    this.applyFilters();
+  }
 
+  // Apply Filters
+  applyFilters() {
+    const params: any = {};
+
+    if (this.filterText.trim()) {
+      params.search = this.filterText.trim();
+    }
+
+    if (this.startDate) {
+      params.startDate = this.startDate;
+    }
+
+    if (this.endDate) {
+      params.endDate = this.endDate;
+    }
+
+    if (this.sortMode) {
+      params.sortOrder = this.sortMode;
+    }
+
+    console.log('🔍 Applying filters:', params);
+
+    this.isLoadingHistory = true;
+
+    this.visitorService.getReturnHistory(params).subscribe({
+      next: (response) => {
+        console.log('✅ Filtered results:', response.length, 'records');
+        this.historyList = response;
+        this.isLoadingHistory = false;
+      },
+      error: (error) => {
+        console.error('❌ Filter error:', error);
+        this.isLoadingHistory = false;
+      }
+    });
+  }
+
+  // แปลง dd/mm/yyyy → yyyy-mm-dd
+  convertToISO(dateStr: string): string {
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month}-${day}`;
+  }
 }

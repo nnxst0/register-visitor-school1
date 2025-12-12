@@ -41,6 +41,14 @@ func main() {
 
 	// API routes
 	api := router.PathPrefix("/api").Subrouter()
+
+	// ⚠️ IMPORTANT: Return Card routes ต้องมาก่อน! เพราะมีคำเฉพาะ
+	// ถ้าไว้หลัง {id} มันจะคิดว่า "return-history" คือ id
+	api.HandleFunc("/visitors/return-history", visitorHandler.GetReturnHistory).Methods("GET")
+	api.HandleFunc("/visitors/rfid/{cardId}", visitorHandler.SearchByRFID).Methods("GET")
+	api.HandleFunc("/visitors/return/{cardId}", visitorHandler.ReturnCard).Methods("POST")
+
+	// Visitor CRUD routes (ต้องมาหลัง specific routes)
 	api.HandleFunc("/visitors", visitorHandler.CreateVisitor).Methods("POST")
 	api.HandleFunc("/visitors", visitorHandler.ListVisitors).Methods("GET")
 	api.HandleFunc("/visitors/{id}", visitorHandler.GetVisitor).Methods("GET")
@@ -73,7 +81,13 @@ func main() {
 
 	log.Printf("Server is running on http://%s:%s", cfg.Server.Host, cfg.Server.Port)
 	log.Printf("Health check: http://%s:%s/health", cfg.Server.Host, cfg.Server.Port)
-	log.Printf("API endpoint: http://%s:%s/api", cfg.Server.Host, cfg.Server.Port)
+	log.Printf("API endpoints:")
+	log.Printf("  - POST   /api/visitors")
+	log.Printf("  - GET    /api/visitors")
+	log.Printf("  - GET    /api/visitors/{id}")
+	log.Printf("  - GET    /api/visitors/return-history ✨")
+	log.Printf("  - GET    /api/visitors/rfid/{cardId} ✨")
+	log.Printf("  - POST   /api/visitors/return/{cardId} ✨")
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Failed to start server: %v", err)

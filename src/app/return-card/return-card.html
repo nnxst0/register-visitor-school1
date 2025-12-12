@@ -100,9 +100,26 @@
             <th>สถานะ</th>
           </tr>
         </thead>
+        <!-- แทนที่ส่วน tbody เดิม -->
         <tbody>
+          <!-- กรณีกำลังโหลด -->
+          <tr *ngIf="isLoadingHistory">
+            <td colspan="7" style="text-align: center; padding: 20px;">
+              <i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...
+            </td>
+          </tr>
+
+          <!-- กรณีไม่มีข้อมูล -->
+          <tr *ngIf="!isLoadingHistory && historyList.length === 0">
+            <td colspan="7" style="text-align: center; padding: 20px; color: #999;">
+              <i class="fas fa-inbox"></i> ยังไม่มีประวัติการคืนบัตร
+            </td>
+          </tr>
+
+          <!-- แสดงข้อมูล -->
           <tr *ngFor="let item of historyList; let i = index">
-            <td class="col-no">{{ item.no }}</td> <td class="col-code">{{ item.cardId }}</td>
+            <td class="col-no">{{ item.no }}</td>
+            <td class="col-code">{{ item.cardId }}</td>
             <td class="col-name">{{ item.name }}</td>
             <td class="col-time">{{ item.timeIn }}</td>
             <td class="col-time">{{ item.timeOut }}</td>

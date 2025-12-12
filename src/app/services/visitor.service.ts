@@ -36,6 +36,23 @@ export interface VisitorListResponse {
   registeredAt: string;
 }
 
+export interface RFIDCardResponse {
+  id: string;
+  name: string;
+  checkIn: string;
+  checkOut: string;
+}
+
+export interface ReturnCardHistoryResponse {
+  no: number;
+  cardId: string;
+  name: string;
+  timeIn: string;
+  timeOut: string;
+  date: string;
+  status: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -77,5 +94,45 @@ export class VisitorService {
   // ดึง Visitor ตาม ID
   getVisitorById(id: number): Observable<Visitor> {
     return this.http.get<Visitor>(`${this.apiUrl}/${id}`);
+  }
+
+  // ============ Return Card Methods ============
+
+  // ค้นหาข้อมูลบัตรจาก RFID
+  searchByRFID(cardId: string): Observable<RFIDCardResponse> {
+    return this.http.get<RFIDCardResponse>(`${this.apiUrl}/rfid/${cardId}`);
+  }
+
+  // คืนบัตร
+  returnCard(cardId: string, checkOut: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/return/${cardId}`, { checkOut });
+  }
+
+  // ดึงประวัติการคืนบัตร
+  getReturnHistory(params?: {
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    sortOrder?: string;
+  }): Observable<ReturnCardHistoryResponse[]> {
+    let httpParams = new HttpParams();
+    
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params?.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+    if (params?.endDate) {
+      httpParams = httpParams.set('endDate', params.endDate);
+    }
+    if (params?.sortOrder) {
+      httpParams = httpParams.set('sortOrder', params.sortOrder);
+    }
+
+    return this.http.get<ReturnCardHistoryResponse[]>(
+      `${this.apiUrl}/return-history`, 
+      { params: httpParams }
+    );
   }
 }
