@@ -25,6 +25,7 @@ type Visitor struct {
 	OfficerName  string     `json:"officerName" db:"officer_name"`
 	IDCardImage  string     `json:"idCardImage" db:"id_card_image"`
 	RegisteredAt time.Time  `json:"registeredAt" db:"registered_at"`
+	ExitTime     *time.Time `json:"exitTime" db:"exit_time"`
 	UpdatedAt    time.Time  `json:"updatedAt" db:"updated_at"`
 }
 
@@ -43,7 +44,7 @@ type CreateVisitorRequest struct {
 	SubDistrict  string  `json:"subDistrict"`
 	District     string  `json:"district"`
 	Province     string  `json:"province"`
-	RFID         string  `json:"rfid" validate:"required"`
+	RFID         string  `json:"rfid"`
 	Department   string  `json:"department"`
 	OfficerName  string  `json:"officerName"`
 	IDCardImage  string  `json:"idCardImage"`
@@ -56,19 +57,22 @@ type VisitorListResponse struct {
 	Name         string `json:"name"`
 	BirthDate    string `json:"birthDate"`
 	Phone        string `json:"phone"`
+	LicensePlate string `json:"licensePlate"`
 	Address      string `json:"address"`
 	RFID         string `json:"rfid"`
 	Department   string `json:"department"`
 	OfficerName  string `json:"officerName"`
 	RegisteredAt string `json:"registeredAt"`
+	ExitTime     string `json:"exitTime"`
 }
 
 // QueryParams represents query parameters for filtering
 type QueryParams struct {
-	Search    string `json:"search"`
-	StartDate string `json:"startDate"`
-	EndDate   string `json:"endDate"`
-	SortOrder string `json:"sortOrder"` // "latest" or "oldest"
-	Page      int    `json:"page"`
-	Limit     int    `json:"limit"`
+	Search     string `json:"search"`
+	StartDate  string `json:"startDate"`
+	EndDate    string `json:"endDate"`
+	SortOrder  string `json:"sortOrder"`
+	Department string `json:"department"`
+	Page       int    `json:"page"`
+	Limit      int    `json:"limit"`
 }

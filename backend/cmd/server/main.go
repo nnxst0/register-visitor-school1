@@ -32,18 +32,28 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize repository and handler
+	// Initialize repositories ⭐ เพิ่มบรรทัดนี้
 	visitorRepo := repository.NewVisitorRepository(db.DB)
+	exportRepo := repository.NewExportRepository(db.DB) // ⭐ เพิ่มบรรทัดนี้
+
+	// Initialize handlers ⭐ แก้ไขบรรทัดนี้
 	visitorHandler := handlers.NewVisitorHandler(visitorRepo)
+	exportHandler := handlers.NewExportHandler(visitorRepo, exportRepo) // ⭐ เพิ่มบรรทัดนี้
 
 	// Setup router
 	router := mux.NewRouter()
 
 	// API routes
 	api := router.PathPrefix("/api").Subrouter()
+
+	// Visitor routes (เดิม)
 	api.HandleFunc("/visitors", visitorHandler.CreateVisitor).Methods("POST")
 	api.HandleFunc("/visitors", visitorHandler.ListVisitors).Methods("GET")
 	api.HandleFunc("/visitors/{id}", visitorHandler.GetVisitor).Methods("GET")
+
+	// Export routes ⭐ เพิ่มทั้ง 2 บรรทัดนี้
+	api.HandleFunc("/export-history", exportHandler.GetExportHistory).Methods("GET")
+	api.HandleFunc("/export-history", exportHandler.CreateExportHistory).Methods("POST")
 
 	// Health check
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
