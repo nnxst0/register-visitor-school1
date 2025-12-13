@@ -34,6 +34,7 @@ export interface VisitorListResponse {
   department: string;
   officerName: string;
   registeredAt: string;
+  exitTime?: string;
 }
 
 export interface RFIDCardResponse {

@@ -3,14 +3,15 @@
 :host {
   font-family: 'Mitr', sans-serif;
   display: block;
-  min-height: 100vh;;
+  min-height: 100vh;
+  ;
 }
 
 .container {
   min-height: 100vh;
   background: linear-gradient(135deg, #A2DCE7 0%, #2E50BC 100%);
   padding: 2rem;
-  font-family: 'mitr', sans-serif;  
+  font-family: 'mitr', sans-serif;
   flex-direction: column;
   align-items: center;
 }
@@ -48,7 +49,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-title-pill {
@@ -65,14 +66,17 @@
   width: 100%;
   max-width: 750px;
   margin-bottom: 20px;
-  
+
   label {
     display: block;
     color: #3150b4;
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 1.1rem;
-    i { margin-right: 5px; }
+
+    i {
+      margin-right: 5px;
+    }
   }
 
   .input-group {
@@ -87,7 +91,11 @@
       font-size: 1rem;
       font-family: 'Prompt', sans-serif;
       outline: none;
-      &:focus { border-color: #3150b4; box-shadow: 0 0 0 2px rgba(49, 80, 180, 0.2); }
+
+      &:focus {
+        border-color: #3150b4;
+        box-shadow: 0 0 0 2px rgba(49, 80, 180, 0.2);
+      }
     }
 
     .btn-search {
@@ -100,7 +108,10 @@
       font-size: 1.1rem;
       font-weight: 500;
       cursor: pointer;
-      &:hover { background-color: #f9a825; }
+
+      &:hover {
+        background-color: #f9a825;
+      }
     }
   }
 }
@@ -125,6 +136,7 @@
     min-width: 80px;
     text-align: center;
   }
+
   .value-box {
     background-color: white;
     padding: 10px 40px;
@@ -141,7 +153,7 @@
   margin-bottom: 25px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   .info-header {
     background-color: #3150b4;
@@ -152,6 +164,7 @@
     font-weight: 500;
     text-align: center;
   }
+
   .info-row {
     background-color: white;
     display: grid;
@@ -161,8 +174,10 @@
     font-weight: 600;
     font-size: 1.1rem;
     color: #333;
-    
-    .text-name { font-weight: 600; }
+
+    .text-name {
+      font-weight: 600;
+    }
   }
 }
 
@@ -180,8 +195,12 @@
     font-weight: 500;
     font-family: "Mitr", sans-serif;
     cursor: pointer;
-    box-shadow: 0 3px 5px rgba(0,0,0,0.15);
-    &:hover { background-color: #f9a825; transform: translateY(-1px); }
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      background-color: #f9a825;
+      transform: translateY(-1px);
+    }
   }
 }
 
@@ -190,7 +209,7 @@
   background-color: #ffffff;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .history-header {
@@ -223,117 +242,172 @@
       align-items: center;
       gap: 5px;
       border: 1px solid #ddd;
-      
-      input { border: none; outline: none; font-size: 0.9rem; width: 80px; color: #3150b4; }
-      i { color: #3150b4; }
+
+      input {
+        border: none;
+        outline: none;
+        font-size: 0.9rem;
+        width: 80px;
+        color: #3150b4;
+      }
+
+      i {
+        color: #3150b4;
+      }
     }
   }
 }
 
 .table-container {
   background-color: transparent;
-  
+
   table {
     width: 100%;
-    border-collapse: separate; 
+    border-collapse: separate;
     border-spacing: 0;
-    
+
     thead {
       tr {
         background-color: #fbc02d;
         color: white;
         text-align: center;
-        
+
         th {
           padding: 12px;
           font-weight: 500;
-          &:first-child { border-radius: 8px 0 0 0; }
-          &:last-child { border-radius: 0 8px 0 0; }
+
+          &:first-child {
+            border-radius: 8px 0 0 0;
+          }
+
+          &:last-child {
+            border-radius: 0 8px 0 0;
+          }
         }
       }
     }
 
     tbody {
       tr {
-        background-color: #dbeff6;
+        /* ลบ background-color เดิมออก */
+        /* background-color: #dbeff6; */
         border-bottom: 1px solid #bcdde6;
         text-align: center;
-        
+
         td {
           padding: 12px;
           color: #3150b4;
           font-weight: 500;
         }
+
+        /* ⭐ เพิ่มสีสลับตรงนี้ */
+        &:nth-child(odd) {
+          background-color: #E8F4F8;
+          /* สีฟ้าอ่อน - แถวคี่ */
+        }
+
+        &:nth-child(even) {
+          background-color: white;
+          /* สีขาว - แถวคู่ */
+        }
+
+        &:hover {
+          background-color: #c8d9e9;
+          /* สีเข้มขึ้นเมื่อ hover */
+          cursor: pointer;
+        }
       }
     }
+
+    .col-no {
+      width: 50px;
+      color: #3150b4 !important;
+      font-weight: bold !important;
+    }
+
+    .col-code {
+      color: #3150b4;
+    }
+
+    .col-name {
+      text-align: left;
+      padding-left: 30px !important;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: white;
+
+      &.success {
+        background-color: #64dd17;
+        /* เขียว */
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .empty-rows {
+      .empty-row {
+        height: 45px;
+        background-color: #dbeff6;
+        border-top: 1px solid #a8d5e2;
+
+        &:nth-child(even) {
+          background-color: #eaf6fa;
+        }
+      }
+
+      border-bottom: 1px solid #a8d5e2;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* กล่องฟิลเตอร์แต่ละอัน */
+    .filter-search,
+    .filter-date,
+    .filter-sort {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border-radius: 16px;
+      padding: 10px 18px;
+      font-size: 16px;
+      border: 1px solid #dcdcdc;
+      min-width: 150px;
+      /* เพิ่มความกว้างขั้นต่ำ */
+    }
+
+    /* input ค้นหา */
+    .filter-search input {
+      border: none;
+      outline: none;
+      width: 120px;
+      font-size: 16px;
+    }
+
+    /* input วันที่ */
+    .filter-date input[type="date"] {
+      border: none;
+      outline: none;
+      font-size: 16px;
+      width: 140px;
+      /* เพิ่มความกว้าง */
+    }
+
+    /* ไอคอน */
+    .filter-search i,
+    .filter-date i,
+    .filter-sort i {
+      color: #2355d8;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
   }
-}
-
-.col-no { width: 50px; color: #d97706 !important; font-weight: bold !important; }
-.col-code { color: #3150b4; }
-.col-name { text-align: left; padding-left: 30px !important; }
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  color: white;
-  &.success { background-color: #64dd17; /* เขียว */ box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-}
-
-.empty-rows {
-  .empty-row {
-    height: 45px;
-    background-color: #dbeff6;
-    border-top: 1px solid #a8d5e2;
-    &:nth-child(even) { background-color: #eaf6fa; }
-  }
-  border-bottom: 1px solid #a8d5e2;
-  border-radius: 0 0 8px 8px;
-}
-
-.filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* กล่องฟิลเตอร์แต่ละอัน */
-.filter-search,
-.filter-date,
-.filter-sort {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: white;
-  border-radius: 16px;
-  padding: 10px 18px;
-  font-size: 16px;
-  border: 1px solid #dcdcdc;
-  min-width: 150px; /* เพิ่มความกว้างขั้นต่ำ */
-}
-
-/* input ค้นหา */
-.filter-search input {
-  border: none;
-  outline: none;
-  width: 120px;
-  font-size: 16px;
-}
-
-/* input วันที่ */
-.filter-date input[type="date"] {
-  border: none;
-  outline: none;
-  font-size: 16px;
-  width: 140px; /* เพิ่มความกว้าง */
-}
-
-/* ไอคอน */
-.filter-search i,
-.filter-date i,
-.filter-sort i {
-  color: #2355d8;
-  font-size: 18px;
-  flex-shrink: 0;
 }

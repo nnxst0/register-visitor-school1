@@ -27,6 +27,10 @@ type Visitor struct {
 	RegisteredAt time.Time  `json:"registeredAt" db:"registered_at"`
 	ExitTime     *time.Time `json:"exitTime" db:"exit_time"`
 	UpdatedAt    time.Time  `json:"updatedAt" db:"updated_at"`
+
+	// ⭐ เพิ่ม 2 field นี้สำหรับ Export (ไม่ได้มาจาก DB)
+	Name    string `json:"name" db:"-"`
+	Address string `json:"address" db:"-"`
 }
 
 // CreateVisitorRequest represents the request body for creating a visitor

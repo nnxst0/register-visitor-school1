@@ -208,6 +208,64 @@ func (h *VisitorHandler) ListVisitors(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, response)
 }
 
+// GetVisitors สำหรับ Export - GET /api/visitors/export
+func (h *VisitorHandler) GetVisitors(w http.ResponseWriter, r *http.Request) {
+	startDate := r.URL.Query().Get("startDate")
+	endDate := r.URL.Query().Get("endDate")
+	department := r.URL.Query().Get("department")
+
+	if startDate == "" || endDate == "" {
+		respondWithError(w, http.StatusBadRequest, "startDate and endDate are required")
+		return
+	}
+
+	visitors, err := h.repo.GetVisitorsForExport(startDate, endDate, department)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to get visitors")
+		return
+	}
+
+	// Transform ข้อมูลสำหรับ Frontend
+	response := make([]map[string]interface{}, len(visitors))
+	for i, v := range visitors {
+		// ⭐ แยกวันที่และเวลาจาก registered_at
+		timeIn := v.RegisteredAt.Format("15:04")              // เวลาเข้า (เช่น "09:36")
+		dateRegistered := v.RegisteredAt.Format("02/01/2006") // วันที่ลงทะเบียน
+
+		var timeOut string
+		if v.ExitTime != nil {
+			timeOut = v.ExitTime.Format("15:04") // เวลาออก (เช่น "17:45")
+		} else {
+			timeOut = "-"
+		}
+
+		var birthDate string
+		if v.BirthDate != nil {
+			birthDate = v.BirthDate.Format("02/01/2006")
+		} else {
+			birthDate = "-"
+		}
+
+		response[i] = map[string]interface{}{
+			"id":           v.ID,
+			"idCard":       v.IDCard,
+			"name":         v.Name,
+			"birthDate":    birthDate,
+			"phone":        v.Phone,
+			"licensePlate": v.LicensePlate,
+			"address":      v.Address,
+			"rfid":         v.RFID,
+			"department":   v.Department,
+			"officerName":  v.OfficerName,
+			"registeredAt": dateRegistered, // วันที่ลงทะเบียน
+			"timeIn":       timeIn,         // ⭐ เวลาเข้า
+			"exitTime":     timeOut,        // ⭐ เวลาออก
+		}
+	}
+
+	respondWithJSON(w, http.StatusOK, response)
+}
+
 // Helper functions
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})

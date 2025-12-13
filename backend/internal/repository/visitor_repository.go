@@ -107,12 +107,12 @@ func (r *VisitorRepository) GetByID(id int) (*models.Visitor, error) {
 // List retrieves visitors with filters
 func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, error) {
 	query := `
-    SELECT id, id_card, first_name, last_name, birth_date, phone, license_plate,
-        house_number, moo, soi, road, sub_district, district, province,
-        rfid, department, officer_name, id_card_image,
-        registered_at, exit_time, updated_at
-    FROM visitors WHERE 1=1
-`
+		SELECT id, id_card, first_name, last_name, birth_date, phone, license_plate,
+			house_number, moo, soi, road, sub_district, district, province,
+			rfid, department, officer_name, id_card_image,
+			registered_at, exit_time, updated_at
+		FROM visitors WHERE 1=1
+	`
 
 	args := []interface{}{}
 
@@ -123,7 +123,7 @@ func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, e
 		args = append(args, searchTerm, searchTerm, searchTerm)
 	}
 
-	// ⭐ เพิ่ม Department filter
+	// Department filter
 	if params.Department != "" && params.Department != "ทั้งหมด" {
 		query += ` AND department = ?`
 		args = append(args, params.Department)
@@ -199,6 +199,76 @@ func (r *VisitorRepository) List(params models.QueryParams) ([]models.Visitor, e
 	return visitors, nil
 }
 
+// ⭐ เพิ่มฟังก์ชันนี้สำหรับ Export
+func (r *VisitorRepository) GetVisitorsForExport(startDate, endDate, department string) ([]models.Visitor, error) {
+	query := `
+		SELECT 
+			id, id_card, first_name, last_name, birth_date, phone, license_plate,
+			house_number, moo, soi, road, sub_district, district, province,
+			rfid, department, officer_name, registered_at, exit_time
+		FROM visitors 
+		WHERE DATE(registered_at) BETWEEN ? AND ?
+	`
+
+	args := []interface{}{startDate, endDate}
+
+	if department != "" && department != "ทั้งหมด" {
+		query += ` AND department = ?`
+		args = append(args, department)
+	}
+
+	query += ` ORDER BY registered_at DESC`
+
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query visitors: %w", err)
+	}
+	defer rows.Close()
+
+	visitors := []models.Visitor{}
+	for rows.Next() {
+		var v models.Visitor
+		var birthDate sql.NullTime
+		var licensePlate, houseNumber, moo, soi, road, subDistrict, district, province sql.NullString
+		var exitTime sql.NullTime
+
+		err := rows.Scan(
+			&v.ID, &v.IDCard, &v.FirstName, &v.LastName,
+			&birthDate, &v.Phone, &licensePlate,
+			&houseNumber, &moo, &soi, &road, &subDistrict, &district, &province,
+			&v.RFID, &v.Department, &v.OfficerName,
+			&v.RegisteredAt, &exitTime,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan visitor: %w", err)
+		}
+
+		if birthDate.Valid {
+			v.BirthDate = &birthDate.Time
+		}
+		v.LicensePlate = licensePlate.String
+		v.HouseNumber = houseNumber.String
+		v.Moo = moo.String
+		v.Soi = soi.String
+		v.Road = road.String
+		v.SubDistrict = subDistrict.String
+		v.District = district.String
+		v.Province = province.String
+
+		if exitTime.Valid {
+			v.ExitTime = &exitTime.Time
+		}
+
+		// สร้างชื่อเต็มและที่อยู่
+		v.Name = v.FirstName + " " + v.LastName
+		v.Address = buildFullAddress(&v)
+
+		visitors = append(visitors, v)
+	}
+
+	return visitors, nil
+}
+
 // CheckIDCardExists checks if ID card already exists
 func (r *VisitorRepository) CheckIDCardExists(idCard string) (bool, error) {
 	query := `SELECT COUNT(*) FROM visitors WHERE id_card = ?`
@@ -221,6 +291,25 @@ func (r *VisitorRepository) CheckRFIDExists(rfid string) (bool, error) {
 	return count > 0, nil
 }
 
+// CheckDuplicateReturn เช็คว่าบัตรถูกคืนวันนี้แล้วหรือยัง
+func (r *VisitorRepository) CheckDuplicateReturn(cardId string) (bool, error) {
+	query := `
+		SELECT COUNT(*) 
+		FROM return_card_logs 
+		WHERE card_id = ? 
+		AND DATE(return_date) = CURDATE()
+	`
+
+	var count int
+	err := r.db.QueryRow(query, cardId).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to check duplicate return: %w", err)
+	}
+
+	return count > 0, nil
+}
+
+// FormatAddress จัดรูปแบบที่อยู่แบบสั้น
 func FormatAddress(v *models.Visitor) string {
 	parts := []string{}
 
@@ -250,7 +339,39 @@ func FormatAddress(v *models.Visitor) string {
 		return "-"
 	}
 
-	// ⭐ ลบการตัดออก - แสดงที่อยู่เต็ม
+	return strings.Join(parts, " ")
+}
+
+// ⭐ buildFullAddress สร้างที่อยู่เต็มสำหรับ Export
+func buildFullAddress(v *models.Visitor) string {
+	parts := []string{}
+
+	if v.HouseNumber != "" {
+		parts = append(parts, "บ้านเลขที่ "+v.HouseNumber)
+	}
+	if v.Moo != "" {
+		parts = append(parts, "หมู่ "+v.Moo)
+	}
+	if v.Soi != "" {
+		parts = append(parts, "ซอย "+v.Soi)
+	}
+	if v.Road != "" {
+		parts = append(parts, "ถนน "+v.Road)
+	}
+	if v.SubDistrict != "" {
+		parts = append(parts, "ตำบล "+v.SubDistrict)
+	}
+	if v.District != "" {
+		parts = append(parts, "อำเภอ "+v.District)
+	}
+	if v.Province != "" {
+		parts = append(parts, "จังหวัด "+v.Province)
+	}
+
+	if len(parts) == 0 {
+		return "-"
+	}
+
 	return strings.Join(parts, " ")
 }
 
@@ -260,22 +381,4 @@ func FormatThaiDate(t *time.Time) string {
 		return "-"
 	}
 	return t.Format("02/01/2006")
-}
-
-// วางท้ายไฟล์ หลัง FormatThaiDate()
-func (r *VisitorRepository) CheckDuplicateReturn(cardId string) (bool, error) {
-	query := `
-		SELECT COUNT(*) 
-		FROM return_card_logs 
-		WHERE card_id = ? 
-		AND DATE(return_date) = CURDATE()
-	`
-
-	var count int
-	err := r.db.QueryRow(query, cardId).Scan(&count)
-	if err != nil {
-		return false, fmt.Errorf("failed to check duplicate return: %w", err)
-	}
-
-	return count > 0, nil
 }

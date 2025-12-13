@@ -26,6 +26,7 @@ interface Visitor {
   department: string;
   officerName: string;
   registeredAt: string;
+  timeIn?: string;
   exitTime?: string;
 }
 
@@ -191,7 +192,7 @@ export class ExportComponent implements OnInit {
     }
 
     // ดึงข้อมูลจาก API
-    this.http.get<Visitor[]>(`${this.apiUrl}/visitors`, { params }).subscribe({
+    this.http.get<Visitor[]>(`${this.apiUrl}/visitors/export`, { params }).subscribe({
       next: (visitors) => {
         if (visitors.length === 0) {
           this.Swal.close();
@@ -229,6 +230,7 @@ export class ExportComponent implements OnInit {
       'ส่วนงานที่ติดต่อ': v.department,
       'เจ้าหน้าที่': v.officerName,
       'วันที่ลงทะเบียน': v.registeredAt,
+      'เวลาเข้า': (v as any).timeIn || '-',
       'เวลาออก': v.exitTime || '-'
     }));
 
@@ -237,18 +239,19 @@ export class ExportComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'ข้อมูลผู้มาติดต่อ');
 
     const colWidths = [
-      { wch: 8 },  // ลำดับ
-      { wch: 18 }, // เลขบัตรประชาชน
-      { wch: 25 }, // ชื่อ-นามสกุล
-      { wch: 12 }, // วันเกิด
-      { wch: 15 }, // เบอร์โทรศัพท์
-      { wch: 15 }, // ⭐ ทะเบียนรถ (เพิ่มใหม่)
-      { wch: 60 }, // ⭐ ที่อยู่ (เพิ่มความกว้าง)
-      { wch: 15 }, // RFID
-      { wch: 25 }, // ส่วนงาน
-      { wch: 20 }, // เจ้าหน้าที่
-      { wch: 20 },  // วันที่ลงทะเบียน
-      { wch: 20 }  // ⭐ เวลาออก
+      { wch: 8 },
+      { wch: 18 },
+      { wch: 25 },
+      { wch: 12 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 60 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 }
     ];
     ws['!cols'] = colWidths;
 

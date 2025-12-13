@@ -51,15 +51,23 @@ func (r *VisitorRepository) GetByRFID(rfid string) (*models.Visitor, error) {
 	return visitor, nil
 }
 
-// CreateReturnLog creates a new return card log
+// CreateReturnLog creates a new return card log AND updates exit_time in visitors table
 func (r *VisitorRepository) CreateReturnLog(log *models.ReturnCardLog) error {
+	// เริ่ม transaction
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// 1. บันทึกลง return_card_logs
 	query := `
 		INSERT INTO return_card_logs (
 			visitor_id, card_id, name, check_in, check_out, return_date, status
 		) VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
 
-	result, err := r.db.Exec(query,
+	result, err := tx.Exec(query,
 		log.VisitorID,
 		log.CardID,
 		log.Name,
@@ -77,8 +85,25 @@ func (r *VisitorRepository) CreateReturnLog(log *models.ReturnCardLog) error {
 	if err != nil {
 		return fmt.Errorf("failed to get last insert id: %w", err)
 	}
-
 	log.ID = int(id)
+
+	// 2. อัปเดต exit_time ในตาราง visitors
+	updateQuery := `
+		UPDATE visitors 
+		SET exit_time = NOW() 
+		WHERE id = ?
+	`
+
+	_, err = tx.Exec(updateQuery, log.VisitorID)
+	if err != nil {
+		return fmt.Errorf("failed to update exit_time: %w", err)
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return nil
 }
 

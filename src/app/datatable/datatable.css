@@ -34,7 +34,7 @@
 
 /* Content Box (กล่องสีฟ้าอ่อน) */
 .content-box {
-  background-color: #ffffff; /* สีพื้นหลังฟ้าอ่อน */
+  background-color: #ffffff; 
   padding: 20px;
   border-radius: 10px;
   min-height: 500px;
@@ -99,7 +99,7 @@ table {
 
 /* Table Header (สีส้ม/เหลือง) */
 thead tr {
-  background-color: #fbb019; /* สีส้มเหลือง */
+  background-color: #fbb019; 
   color: white;
 }
 
@@ -156,7 +156,7 @@ td:last-child {
 
 /* Footer Button (ปุ่มเพิ่มผู้มาติดต่อ) */
 .footer-action {
-  margin-top: auto; /* ดันลงล่างสุด */
+  margin-top: auto;
   display: flex;
   justify-content: center;
   padding-top: 20px;
@@ -188,9 +188,9 @@ input[matStartDate], input[matEndDate] {
 /* คอนเทนเนอร์หลัก พื้นหลังสีฟ้าอ่อน (ปรับสีตามธีมจริงของคุณได้) */
 .custom-date-container {
     display: flex;
-    gap: 15px; /* ระยะห่างระหว่าง 2 ปุ่ม */
-    padding: 20px; /* สีฟ้าตามภาพ */
-    border-radius: 8px; /* หรือเอาออกถ้าพื้นหลังเป็นของทั้งหน้า */
+    gap: 15px; 
+    padding: 20px;
+    border-radius: 8px;
     align-items: center;
 }
 
@@ -198,13 +198,13 @@ input[matStartDate], input[matEndDate] {
 .date-pill {
     background-color: #3556c4;
     padding: 8px 16px;
-    border-radius: 50px; /* ทำให้ขอบมนเป็นวงรี */
+    border-radius: 50px; 
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-width: 140px; /* ความกว้างขั้นต่ำ */
+    min-width: 140px; 
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* เงาบางๆ ให้ดูมีมิติ */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
     transition: all 0.2s;
 }
 
@@ -214,14 +214,14 @@ input[matStartDate], input[matEndDate] {
 
 /* ตัวหนังสือวันที่ */
 .date-text {
-    color: #ffffff; /* สีน้ำเงินเข้มตามภาพ */
+    color: #ffffff; 
     font-weight: bold;
     font-size: 16px;
 }
 
 /* ไอคอนลูกศรลง */
 .dropdown-icon {
-    color: #ffffff; /* สีเดียวกับตัวหนังสือ */
+    color: #ffffff; 
     margin-left: 8px;
 }
 

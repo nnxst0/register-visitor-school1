@@ -9,8 +9,8 @@
 }
 
 .export-container {
-  width: 100%;  /* เต็มความกว้าง */
-  max-width: none;  /* ไม่มีขีดจำกัด */
+  width: 100%;
+  max-width: none; 
   margin: 0 auto;
 }
 

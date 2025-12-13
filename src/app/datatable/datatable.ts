@@ -2,7 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input'; 
+import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +13,7 @@ import { VisitorService, VisitorListResponse, Visitor as VisitorData } from '../
 interface Visitor {
   id: number;
   name: string;
-  date: string; 
+  date: string;
   timeIn: string;
   timeOut: string;
   department: string;
@@ -25,15 +25,15 @@ interface Visitor {
   selector: 'app-datatable',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule, 
+    MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
     RouterLink
-  ], 
+  ],
   templateUrl: './datatable.html',
   styleUrls: ['./datatable.css']
 })
@@ -41,12 +41,12 @@ export class DatatableComponent implements OnInit {
   // Date filter
   startDate: Date | null = null;
   endDate: Date | null = null;
-  
+
   // Data
   visitors = signal<Visitor[]>([]);
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
-  
+
   // Image modal - ประกาศทุกตัวแปรที่จำเป็น
   showImageModal = signal<boolean>(false);
   selectedVisitorId = signal<number | null>(null);
@@ -57,7 +57,7 @@ export class DatatableComponent implements OnInit {
   constructor(
     private router: Router,
     private visitorService: VisitorService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadVisitors();
@@ -99,7 +99,9 @@ export class DatatableComponent implements OnInit {
       name: item.name,
       date: this.formatThaiDate(item.registeredAt),
       timeIn: this.extractTime(item.registeredAt),
-      timeOut: '-',
+      timeOut: item.exitTime && item.exitTime !== '-'
+        ? this.extractTime(item.exitTime)  // ⭐ แก้ตรงนี้
+        : '-',
       department: this.formatDepartment(item.department, item.officerName),
       hasImage: true,
       status: 'เสร็จสิ้น'
@@ -107,23 +109,36 @@ export class DatatableComponent implements OnInit {
   }
 
   formatThaiDate(dateString: string): string {
-    const date = new Date(dateString);
+    if (!dateString || dateString === '-') return '-';
+
+    // แปลง format "02/01/2006 15:04:05"
+    const parts = dateString.split(' ');
+    if (parts.length < 1) return '-';
+
+    const [day, month, year] = parts[0].split('/');
+
     const thaiMonths = [
       'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
     ];
-    
-    const day = date.getDate();
-    const month = thaiMonths[date.getMonth()];
-    const year = date.getFullYear() + 543;
-    
-    return `${day} ${month} ${year}`;
+
+    const monthIndex = parseInt(month) - 1;
+    const thaiYear = parseInt(year) + 543;
+
+    return `${parseInt(day)} ${thaiMonths[monthIndex]} ${thaiYear}`;
   }
 
   extractTime(dateString: string): string {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    if (!dateString || dateString === '-') return '-';
+
+    // แปลง format "02/01/2006 15:04:05" เป็น Date object
+    const parts = dateString.split(' ');
+    if (parts.length !== 2) return '-';
+
+    const [datePart, timePart] = parts;
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+
     return `${hours}:${minutes}`;
   }
 
@@ -167,11 +182,11 @@ export class DatatableComponent implements OnInit {
     this.visitorService.getVisitorById(id).subscribe({
       next: (visitor: VisitorData) => {
         this.isLoadingImage.set(false);
-        
+
         if (visitor.idCardImage) {
           if (visitor.idCardImage.startsWith('data:image')) {
             this.visitorImage.set(visitor.idCardImage);
-          } 
+          }
           else if (visitor.idCardImage.startsWith('http')) {
             this.visitorImage.set(visitor.idCardImage);
           }

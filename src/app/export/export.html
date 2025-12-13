@@ -53,11 +53,10 @@
         <div class="form-footer">
             <div class="format-buttons">
                 <label>รูปแบบไฟล์</label>
-                <span class="format-text">Excel</span>
+                <label style="color: rgb(56, 56, 56);">Excel</label>
             </div>
 
             <button class="export-btn" (click)="exportData()">
-                <i class="fas fa-download"></i>
                 ส่งออกข้อมูล
             </button>
         </div>
@@ -118,7 +117,6 @@
                         <td>{{ record.dateRange }}</td>
                         <td>
                             <span class="format-badge">
-                                <i class="fas fa-file-excel"></i>
                                 {{ record.format }}
                             </span>
                         </td>
